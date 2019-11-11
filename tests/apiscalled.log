@@ -1,0 +1,991 @@
+
+
+
+GET  https://172.20.3.78:8900//api/system
+200 ok
+
+
+
+
+{
+    "ads_domain": null,
+    "ads_server": null,
+    "ads_workgroup": null,
+    "api_version": "1.0",
+    "cryptsetup_version": "2.0.3-3.el7",
+    "fqdn": "vsnap.devad.catalogic.us",
+    "hostname": "vsnap",
+    "id": "e61ba16df74d4514ac5b55a19a1c04d4",
+    "init_status": "Ready",
+    "localrepl": false,
+    "maintenance_mode": false,
+    "multipool": false,
+    "nfs_version": "1.3.0-0.61.el7",
+    "nginx_version": "1.12.2-3.el7",
+    "os_name": "CentOS Linux",
+    "os_version": "7.5.1804",
+    "samba_version": "4.8.3-4.el7",
+    "uwsgi_version": "2.0.17.1-2.el7",
+    "vsnap_version": "10.1.5-1366",
+    "zfs_version": "0.8.1-20190625.el7"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/pool
+200 ok
+
+
+
+
+{
+    "pools": [
+        {
+            "health": "0",
+            "id": "1",
+            "name": "primary",
+            "pool_type": "raid0",
+            "size_free": "257539742720",
+            "size_total": "515932991488",
+            "size_used": "258393248768",
+            "status": "1.00",
+            "time_created": "1547336985",
+            "time_updated": "1547336985"
+        }
+    ],
+    "total": 1
+}
+
+
+
+API Request:POST
+
+
+Request Body: https://172.20.3.78:8900//api/volume
+200 ok
+
+
+
+
+{
+    "host_ids": null,
+    "id": "61",
+    "is_clone": false,
+    "name": "vol_testoffload",
+    "parent_id": null,
+    "parent_path": null,
+    "partner_id": null,
+    "partner_type": null,
+    "pool_id": "1",
+    "pool_name": "primary",
+    "serial": null,
+    "share_id": null,
+    "size_free": "257541882880",
+    "size_total": "536870912000",
+    "size_used": "24576",
+    "snapshot_id": null,
+    "syncwrite": true,
+    "tags_list": [],
+    "time_created": "1572559526",
+    "time_updated": "1572559526",
+    "volume_type": "filesystem"
+}
+
+
+
+API Request:POST
+
+
+Request Body: https://172.20.3.78:8900//api/volume/61/share
+200 ok
+
+
+
+
+{
+    "id": "151",
+    "name": "/vsnap/vpool1/fs61",
+    "partner_id": null,
+    "share_options": {
+        "allowed_hosts": [
+            "a",
+            "l",
+            "l"
+        ]
+    },
+    "share_type": "nfs",
+    "time_created": "1572559548",
+    "time_updated": "1572559548",
+    "vol_id": "61"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/partner?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "partners": [
+        {
+            "address": "172.20.3.197",
+            "api_key": "punita",
+            "api_port": "9000",
+            "bucket": "prtest",
+            "endpoint": "http://172.20.3.197:9000",
+            "id": "b2bf702741e24c8589a45c40b83fe65b",
+            "max_object_size": 16777216,
+            "partner_type": "cloud",
+            "provider": "sp",
+            "secure": false,
+            "time_created": "1547677029",
+            "time_updated": "1547677029"
+        }
+    ],
+    "total": 1
+}
+
+
+
+API Request:POST
+
+
+Request Body: https://172.20.3.78:8900//api/partner?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "address": "s3-api.us-geo.objectstorage.softlayer.net",
+    "api_key": "a992aa186f964f0dab7a563e0a123a7a",
+    "api_port": "443",
+    "bucket": "spplus",
+    "endpoint": "https://s3-api.us-geo.objectstorage.softlayer.net",
+    "id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "max_object_size": 16777216,
+    "partner_type": "cloud",
+    "provider": "cos",
+    "secure": true,
+    "time_created": "1572559551",
+    "time_updated": "1572559551"
+}
+
+
+
+API Request:POST
+
+
+Request Body: https://172.20.3.78:8900//api/volume/61/relationship?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "last_attempt_snap_id": null,
+    "last_success_binmap_checksum": null,
+    "last_success_dbmap_checksum": null,
+    "last_success_snap_id": null,
+    "last_sync_status": null,
+    "local_pool_id": "1",
+    "local_vol_id": "61",
+    "local_vol_name": "vol_testoffload",
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "remote_vol_name": "vol_testoffload",
+    "time_created": "1572559552",
+    "time_updated": "1572559552"
+}
+
+
+
+API Request:POST
+
+
+Request Body: https://172.20.3.78:8900//api/relationship/aa569a3b945840d891fcb29a0aff8b9e/session?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "upload",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": null,
+    "id": "6ba379f147c7435d919a6843291df621",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": "381",
+    "local_snap_name": "repl_61_1572559554_527884",
+    "local_vol_id": 61,
+    "max_object_size": 16777216,
+    "message": "In queue waiting for next available worker",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "remote_snap_name": "repl_61_1572559554_527884",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 0,
+    "snap_version": "18035087463529901893",
+    "status": "PENDING",
+    "time_ended": null,
+    "time_queued": "1572559559",
+    "time_started": null
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/6ba379f147c7435d919a6843291df621?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "upload",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": null,
+    "id": "6ba379f147c7435d919a6843291df621",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": "381",
+    "local_snap_name": "repl_61_1572559554_527884",
+    "local_vol_id": 61,
+    "max_object_size": 16777216,
+    "message": "Session active",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "remote_snap_name": "repl_61_1572559554_527884",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 0,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559559",
+    "time_started": "1572559567"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/6ba379f147c7435d919a6843291df621?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "upload",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": null,
+    "id": "6ba379f147c7435d919a6843291df621",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": "381",
+    "local_snap_name": "repl_61_1572559554_527884",
+    "local_vol_id": 61,
+    "max_object_size": 16777216,
+    "message": "Preparing cloud gateway device",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "remote_snap_name": "repl_61_1572559554_527884",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 0,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559559",
+    "time_started": "1572559567"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/6ba379f147c7435d919a6843291df621?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "upload",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": null,
+    "id": "6ba379f147c7435d919a6843291df621",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": "381",
+    "local_snap_name": "repl_61_1572559554_527884",
+    "local_vol_id": 61,
+    "max_object_size": 16777216,
+    "message": "Starting data transfer",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "remote_snap_name": "repl_61_1572559554_527884",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 0,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559559",
+    "time_started": "1572559567"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/6ba379f147c7435d919a6843291df621?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "upload",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": null,
+    "id": "6ba379f147c7435d919a6843291df621",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": "381",
+    "local_snap_name": "repl_61_1572559554_527884",
+    "local_vol_id": 61,
+    "max_object_size": 16777216,
+    "message": "Data transfer in progress",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "remote_snap_name": "repl_61_1572559554_527884",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 9859072,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559559",
+    "time_started": "1572559567"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/6ba379f147c7435d919a6843291df621?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "upload",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": null,
+    "id": "6ba379f147c7435d919a6843291df621",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": "381",
+    "local_snap_name": "repl_61_1572559554_527884",
+    "local_vol_id": 61,
+    "max_object_size": 16777216,
+    "message": "Data transfer in progress",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "remote_snap_name": "repl_61_1572559554_527884",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 9859072,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559559",
+    "time_started": "1572559567"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/6ba379f147c7435d919a6843291df621?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "upload",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": null,
+    "id": "6ba379f147c7435d919a6843291df621",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": "381",
+    "local_snap_name": "repl_61_1572559554_527884",
+    "local_vol_id": 61,
+    "max_object_size": 16777216,
+    "message": "Waiting for remaining cached data to be uploaded",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "remote_snap_name": "repl_61_1572559554_527884",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 9859072,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559559",
+    "time_started": "1572559567"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/6ba379f147c7435d919a6843291df621?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "upload",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": null,
+    "id": "6ba379f147c7435d919a6843291df621",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": "381",
+    "local_snap_name": "repl_61_1572559554_527884",
+    "local_vol_id": 61,
+    "max_object_size": 16777216,
+    "message": "Waiting for remaining cached data to be uploaded",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "remote_snap_name": "repl_61_1572559554_527884",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 9859072,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559559",
+    "time_started": "1572559567"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/6ba379f147c7435d919a6843291df621?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "upload",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": null,
+    "id": "6ba379f147c7435d919a6843291df621",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": "381",
+    "local_snap_name": "repl_61_1572559554_527884",
+    "local_vol_id": 61,
+    "max_object_size": 16777216,
+    "message": "Waiting for remaining cached data to be uploaded",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "remote_snap_name": "repl_61_1572559554_527884",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 9859072,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559559",
+    "time_started": "1572559567"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/6ba379f147c7435d919a6843291df621?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "upload",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": null,
+    "id": "6ba379f147c7435d919a6843291df621",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": "381",
+    "local_snap_name": "repl_61_1572559554_527884",
+    "local_vol_id": 61,
+    "max_object_size": 16777216,
+    "message": "Waiting for remaining cached data to be uploaded",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "remote_snap_name": "repl_61_1572559554_527884",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 9859072,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559559",
+    "time_started": "1572559567"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/6ba379f147c7435d919a6843291df621?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "upload",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": null,
+    "id": "6ba379f147c7435d919a6843291df621",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": "381",
+    "local_snap_name": "repl_61_1572559554_527884",
+    "local_vol_id": 61,
+    "max_object_size": 16777216,
+    "message": "Waiting for remaining cached data to be uploaded",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "remote_snap_name": "repl_61_1572559554_527884",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 9859072,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559559",
+    "time_started": "1572559567"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/6ba379f147c7435d919a6843291df621?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "upload",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": null,
+    "id": "6ba379f147c7435d919a6843291df621",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": "381",
+    "local_snap_name": "repl_61_1572559554_527884",
+    "local_vol_id": 61,
+    "max_object_size": 16777216,
+    "message": "Data transfer complete; Optimizing blockmap metadata",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "remote_snap_name": "repl_61_1572559554_527884",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 9859072,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559559",
+    "time_started": "1572559567"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/6ba379f147c7435d919a6843291df621?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "upload",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": null,
+    "id": "6ba379f147c7435d919a6843291df621",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": "381",
+    "local_snap_name": "repl_61_1572559554_527884",
+    "local_vol_id": 61,
+    "max_object_size": 16777216,
+    "message": "Completed",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": "aa569a3b945840d891fcb29a0aff8b9e",
+    "remote_snap_name": "repl_61_1572559554_527884",
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 9859072,
+    "snap_version": "18035087463529901893",
+    "status": "COMPLETED",
+    "time_ended": "1572559676",
+    "time_queued": "1572559559",
+    "time_started": "1572559567"
+}
+
+
+
+API Request:POST
+
+
+Request Body: https://172.20.3.78:8900/api/partner/8a097112faa04f4eafc09a8bcffb2c21/volume
+200 ok
+
+
+
+
+{
+    "action": "clone",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": "vol_base_offload",
+    "id": "2785002c56c847808f791fb4b4670048",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": null,
+    "local_snap_name": null,
+    "local_vol_id": null,
+    "max_object_size": null,
+    "message": "In queue waiting for next available worker",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": null,
+    "remote_snap_name": null,
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 0,
+    "snap_version": "18035087463529901893",
+    "status": "PENDING",
+    "time_ended": null,
+    "time_queued": "1572559684",
+    "time_started": null
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/2785002c56c847808f791fb4b4670048?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "clone",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": "vol_base_offload",
+    "id": "2785002c56c847808f791fb4b4670048",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": null,
+    "local_snap_name": null,
+    "local_vol_id": null,
+    "max_object_size": null,
+    "message": "Session active",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": null,
+    "remote_snap_name": null,
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 0,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559684",
+    "time_started": "1572559689"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/2785002c56c847808f791fb4b4670048?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "clone",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": "vol_base_offload",
+    "id": "2785002c56c847808f791fb4b4670048",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": null,
+    "local_snap_name": null,
+    "local_vol_id": null,
+    "max_object_size": null,
+    "message": "Session active",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": null,
+    "remote_snap_name": null,
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 0,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559684",
+    "time_started": "1572559689"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/2785002c56c847808f791fb4b4670048?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "clone",
+    "bucket_id": "spplus",
+    "clone_vol_id": null,
+    "clone_vol_name": "vol_base_offload",
+    "id": "2785002c56c847808f791fb4b4670048",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": null,
+    "local_snap_name": null,
+    "local_vol_id": null,
+    "max_object_size": null,
+    "message": "Session active",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": null,
+    "remote_snap_name": null,
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 0,
+    "snap_version": "18035087463529901893",
+    "status": "ACTIVE",
+    "time_ended": null,
+    "time_queued": "1572559684",
+    "time_started": "1572559689"
+}
+
+
+
+GET  https://172.20.3.78:8900//api/session/2785002c56c847808f791fb4b4670048?partner_type=cloud
+200 ok
+
+
+
+
+{
+    "action": "clone",
+    "bucket_id": "spplus",
+    "clone_vol_id": "43c64d64c06747b8a97374536e9cdfec",
+    "clone_vol_name": "vol_base_offload",
+    "id": "2785002c56c847808f791fb4b4670048",
+    "is_cancelled": false,
+    "local_pool_id": 1,
+    "local_snap_id": null,
+    "local_snap_name": null,
+    "local_vol_id": null,
+    "max_object_size": null,
+    "message": "Completed",
+    "num_objects_written": 0,
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "partner_type": "cloud",
+    "priority": "50",
+    "rebase": false,
+    "rel_id": null,
+    "remote_snap_name": null,
+    "remote_vol_id": "162b48b8c7184d048cab5fd4b193dcb0",
+    "size_sent": 0,
+    "snap_version": "18035087463529901893",
+    "status": "COMPLETED",
+    "time_ended": "1572559722",
+    "time_queued": "1572559684",
+    "time_started": "1572559689"
+}
+
+
+
+API Request:POST
+
+
+Request Body: https://172.20.3.78:8900//api/partner/8a097112faa04f4eafc09a8bcffb2c21/volume/43c64d64c06747b8a97374536e9cdfec/share
+200 ok
+
+
+
+
+{
+    "id": "1de603f7fb034bfd8ffe64e80f3e8b5d",
+    "name": "/vsnap/rpool43c64d64c06747b8a97374536e9cdfec/fs43c64d64c06747b8a97374536e9cdfec",
+    "partner_id": "8a097112faa04f4eafc09a8bcffb2c21",
+    "share_options": {
+        "allowed_hosts": [
+            "a",
+            "l",
+            "l"
+        ]
+    },
+    "share_type": "nfs",
+    "time_created": "1572559727",
+    "time_updated": "1572559727",
+    "vol_id": "43c64d64c06747b8a97374536e9cdfec"
+}
+
+
+
+API Request:DELETE
+
+
+Request Body: https://172.20.3.78:8900/api/partner/8a097112faa04f4eafc09a8bcffb2c21/share/1de603f7fb034bfd8ffe64e80f3e8b5d
+200 ok
+
+
+
+
+{}
+
+
+
+API Request:DELETE
+
+
+Request Body: https://172.20.3.78:8900/api/partner/8a097112faa04f4eafc09a8bcffb2c21/volume/43c64d64c06747b8a97374536e9cdfec
+200 ok
+
+
+
+
+{
+    "sessions": [],
+    "total": 0
+}
+
+
+
+API Request:DELETE
+
+
+Request Body: https://172.20.3.78:8900//api/relationship/aa569a3b945840d891fcb29a0aff8b9e?partner_type=cloud
+200 ok
+
+
+
+
+{}
+Traceback (most recent call last):
+  File "/home/punita/vsnap_s3_verify/catalogic_cloud_tests/tests/common/util.py", line 18, in run_silently
+    func()
+  File "/home/punita/vsnap_s3_verify/catalogic_cloud_tests/tests/test_performance.py", line 105, in <lambda>
+    path="{}/snapshot/{}".format(resources['partner']['id'], snap)))
+TypeError: delete() missing 1 required positional argument: 'resid'
+
+
+
+
+API Request:DELETE
+
+
+Request Body: https://172.20.3.78:8900//api/partner/8a097112faa04f4eafc09a8bcffb2c21?partner_type=cloud
+200 ok
+
+
+
+
+{}
+
+
+
+API Request:DELETE
+
+
+Request Body: https://172.20.3.78:8900//api/share/151
+200 ok
+
+
+
+
+{}
+
+
+
+API Request:DELETE
+
+
+Request Body: https://172.20.3.78:8900//api/volume/61?force=true
+200 ok
+
+
+
+
+{}

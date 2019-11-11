@@ -1,0 +1,19 @@
+Metadata-Version: 1.1
+Name: vsnap
+Version: 0.0.1
+Summary: Vsnap client
+Home-page: gitrepo2.ad.catalogic.us
+Author: Punita Repe
+Author-email: prepe@catalogicsoftware.com
+License: UNKNOWN
+Description: # README #
+        
+        This README would normally document whatever steps are necessary to get your application up and running.
+        
+        ### What is this repository for? ###
+        
+        * Client for Vsnap testsing 
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Operating System :: OS Independent

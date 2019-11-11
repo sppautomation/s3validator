@@ -1,0 +1,7 @@
+clientcore/__init__.py
+clientcore/client.py
+vsnap.egg-info/PKG-INFO
+vsnap.egg-info/SOURCES.txt
+vsnap.egg-info/dependency_links.txt
+vsnap.egg-info/requires.txt
+vsnap.egg-info/top_level.txt
