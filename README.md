@@ -42,10 +42,11 @@ can leave it as is.
 In directory tests update the pytest.ini file to set the offload size in MB's.
 
 Default values are as follows:
-    * Base offload 10 MB
-    * Incremental offload 5 MB
-    * Number of increments 3
-    * Total time out 10800 seconds
+
+* Base offload 10 MB
+* Incremental offload 5 MB
+* Number of increments 3
+* Total time out 10800 seconds
 
 
 ## Running the tests
