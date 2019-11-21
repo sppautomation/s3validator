@@ -96,8 +96,8 @@ def cleanup(global_config, resources):
                                resid=resources['relationship']["id"] + "?partner_type=cloud"))
     if resources['snapshots']:
         for snap in resources['snapshots']:
-            util.run_silently(lambda: client.VsnapAPI(session, 'partner').delete(
-                path="{}/snapshot/{}".format(resources['partner']['id'], snap)))
+            util.run_silently(lambda: client.VsnapAPI(session, 'api/partner/' + resources['partner']['id'] + '/snapshot').delete(
+                resid=snap))
 
     if resources['delete_partner']:
         util.run_silently_pred(resources.get("partner", None),

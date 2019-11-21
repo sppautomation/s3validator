@@ -1,5 +1,26 @@
 #!/bin/bash
 
-set -e
+set -ex
 cd tests
-../test_env/bin/pytest -v -x -s --junit-xml=test-results.xml test_partner_relation.py test_performance.py test_offload.py
+
+
+if [  $1 == "functional" ]
+then
+../test_env/bin/pytest -v -x -s --junit-xml=test-results.xml  test_offload.py
+
+fi
+
+if [ $1 == "performance" ]
+then
+../test_env/bin/pytest -v -x -s --junit-xml=test-results.xml  test_performance.py
+
+fi
+
+if [ $1 == "scale" ]
+then
+../test_env/bin/pytest -v -x -s --junit-xml=test-results.xml  test_scale.py
+
+fi
+
+
+

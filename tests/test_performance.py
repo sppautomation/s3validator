@@ -17,7 +17,7 @@ from common import system, util, consts
 
 config = configparser.ConfigParser()
 config.read("pytest.ini")
-base_file_size_MB = int(config.get('offload_test', 'base_file_size_MB'))
+base_file_size_MB = int(config.get('performance_test', 'base_file_size_MB'))
 
 def title_txt(txt): print('\x1b[5;30;42m' + txt + '\x1b[0m')
 
@@ -102,10 +102,8 @@ def cleanup(global_config, resources):
                                resid=resources['relationship']["id"] + "?partner_type=cloud"))
     if resources['snapshots']:
         for snap in resources['snapshots']:
-            print("partner id is : {}".format(resources['partner']['id']))
-            print("snap version is : {}".format(snap))
-            util.run_silently(lambda: client.VsnapAPI(session, 'partner').delete(
-                path="{}/snapshot/{}".format(resources['partner']['id'], snap)))
+            util.run_silently(lambda: client.VsnapAPI(session, 'api/partner/' + resources['partner']['id'] + '/snapshot').delete(
+                resid=snap))
 
     if resources['delete_partner']:
         util.run_silently_pred(resources.get("partner", None),
