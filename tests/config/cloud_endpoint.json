@@ -1,9 +1,8 @@
 
 {
-  "endpoint": "httpxxxxxftlayer.net",
-    "api_key": "a992axxxxxe0a123a7a",
-    "api_secret": "41590exxxxxxxd4c3e37b4504a6e1",
+    "endpoint": "s3.xxxxxx.com",
+    "api_key": "AKxxxxxxxHUYAKA",
+    "api_secret": "N7xxxxxxxxx1O",
     "bucket": "test",
     "provider": "generic"
-
 }

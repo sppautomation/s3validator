@@ -219,7 +219,7 @@ def restore(offload_session, resources, global_config, filename, vol_name):
         print("\n")
         title_txt("RESTORE:")
 
-        analysis_restore.add_row(["Restore", "{} (hh:mm:ss)".format(t), "{}]".format(base_file_size_MB)])
+        analysis_restore.add_row(["Restore", "{} (hh:mm:ss)".format(t), "{}".format(base_file_size_MB)])
         print(analysis_restore)
 
 

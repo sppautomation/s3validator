@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -ex
 cd tests
 
 
@@ -12,7 +11,7 @@ fi
 
 if [ $1 == "performance" ]
 then
-../test_env/bin/pytest -v -x -s --junit-xml=test-results.xml  test_performance.py
+../test_env/bin/pytest -v -x -s --junit-xml=test-results.xml   test_performance.py
 
 fi
 

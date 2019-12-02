@@ -5,6 +5,7 @@ import time
 import configparser
 import shutil
 import datetime
+from prettytable import PrettyTable
 
 import pytest
 
@@ -18,6 +19,8 @@ count_of_offloads = int(config.get('scale_test', 'num_of_offloads'))
 base_file_size_MB = int(config.get('scale_test', 'base_file_size_MB'))
 max_vsnap_streams = int(config.get('scale_test', 'max_vsnap_streams'))
 
+analysis_offload = PrettyTable()
+analysis_offload.field_names = ["Offload count", "Total Time (seconds)", "Max streams", "Each offload size (MB's)"]
 
 @pytest.fixture(scope="module")
 def setup(global_config, request):
@@ -34,7 +37,16 @@ def setup(global_config, request):
     return resources
 
 def cleanup(global_config, resources):
+
+
     session = global_config.session
+
+    analysis_offload.add_row([count_of_offloads, resources['total_offload_time'], max_vsnap_streams, base_file_size_MB])
+    print("\n\n")
+    print(analysis_offload)
+    # print("File size used for offloads: {}".format(base_file_size_MB))
+    # print("Total number of offloads: {}".format(count_of_offloads))
+    # print("Total time taken for all offloads is: {} minutes".format(resources['total_offload_time'] / 60))
 
     if resources['mountpoints']:
         for mount in resources['mountpoints']:
@@ -45,10 +57,9 @@ def cleanup(global_config, resources):
             util.run_silently(lambda: client.VsnapAPI(session, 'relationship').delete(
                                resid=relation + "?partner_type=cloud"))
 
-    if resources['partners']:
-        for partner in resources['partners']:
-            util.run_silently(lambda: client.VsnapAPI(session, 'partner').delete(
-                               resid=partner + "?partner_type=cloud"))
+    if resources['partner']:
+        util.run_silently(lambda: client.VsnapAPI(session, 'partner').delete(
+                               resid=resources['partner']['id'] + "?partner_type=cloud"))
 
     if resources['shares']:
         for share in resources['shares']:
@@ -62,12 +73,6 @@ def cleanup(global_config, resources):
 
     client.VsnapAPI(session, '/api/pref').delete(
         resid="cloudMaxStreams")
-
-
-
-    print("File size used for offloads: {}".format(base_file_size_MB))
-    print("Total number of offloads: {}".format(count_of_offloads))
-    print("Total time taken for all offloads is: {} minutes".format(resources['total_offload_time']/60))
 
 
 def monitor_sync_session(clientsess, sync_id):
@@ -146,7 +151,7 @@ def test_createmulti_offloads(count, global_config, setup):
         partnerdata = json.load(open(dataf))
 
     resources['partner'] = client.VsnapAPI(session, '/api/partner?partner_type=cloud').post(data=partnerdata)
-    resources['partners'].append(resources['partner']['id'])
+
 
     relationdata = {"partner_id": resources['partner']['id']}
     resources['relationship'] = client.VsnapAPI(session, '/api/volume').post(
@@ -180,6 +185,8 @@ def test_multioffload_status(count, global_config, setup):
     total_time = float(end) - float(queued)
     print("Offload time = {} seconds".format(total_time))
     resources['total_offload_time'] += total_time
+
+
     assert offload_session['status'] == "COMPLETED"
 
 

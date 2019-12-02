@@ -118,14 +118,10 @@ def monitor_sync_session(clientsess, sync_id):
 
         offload_session = client.VsnapAPI(clientsess, 'session').get(path=sync_id + "?partner_type=cloud")
         status = offload_session['status'];
-        # print("Session details: {}".format(offload_session))
+
 
         if status in ["COMPLETED", "FAILED"]:
-            if offload_session['action'] == 'upload':
-                print("Size offloaded is : {}".format(offload_session['size_sent']))
-            print("Time taken for session {} is :{}".format(offload_session['id'],
-                                                            int(offload_session['time_ended']) - int(offload_session['time_started'])))
-            return offload_session
+           return offload_session
 
 
 def restore(offload_session, resources, global_config, filename, vol_name):
@@ -137,7 +133,7 @@ def restore(offload_session, resources, global_config, filename, vol_name):
         restore_session = client.VsnapAPI(session, 'api/partner').post(
             path=offload_session['partner_id'] + "/volume", data=data)
 
-        # print('Restore session id is {}'.format(restore_session['id']))
+
         restore_session = monitor_sync_session(session, restore_session['id'])
         assert restore_session['status'] == "COMPLETED"
         restore_vol_id = restore_session['clone_vol_id']
@@ -220,7 +216,6 @@ def alternate_restore(offload_session, resources, global_config, filename, vol_n
 
 
         # operation on alternate vsnap ended
-        # print('Restore session id is {}'.format(restore_session['id']))
         restore_session = monitor_sync_session(alt_session, restore_session['id'])
         assert restore_session['status'] == "COMPLETED"
         restore_vol_id = restore_session['clone_vol_id']
@@ -295,7 +290,7 @@ def test_base_offload(global_config, setup):
     syncsess = client.VsnapAPI(session, 'relationship').post(
         path=resources['relationship']['id'] + "/session?partner_type=cloud", data={})
 
-    # print("Session id for base offload {}".format(syncsess['id']))
+
     offload_session = monitor_sync_session(session, syncsess['id'])
     resources['base_offload_session'] = offload_session
     assert offload_session['status'] == "COMPLETED"
@@ -317,7 +312,7 @@ def test_incr_offload(path, global_config, setup):
     syncsess = client.VsnapAPI(session, 'relationship').post(
         path=resources['relationship']['id'] + "/session?partner_type=cloud", data={})
 
-    # print("Session id for incremental {} offload {}".format(path, syncsess['id']))
+
     offload_session = monitor_sync_session(session, syncsess['id'])
     if (path == 1):
         resources['incr_filename'] = "testincrfile{}.dat".format(path + 2)
@@ -326,30 +321,18 @@ def test_incr_offload(path, global_config, setup):
     assert offload_session['status'] == "COMPLETED"
     restore(offload_session, resources, global_config, filename, "vol_incr_offload_{}".format(path + 2))
 
-@pytest.mark.timeout(300)
+
 def test_cancel_base_offload(global_config, setup):
     session = global_config.session
     resources = setup
     cancel_offload(session, resources)
 
-@pytest.mark.timeout(300)
+
 @pytest.mark.dependency(depends=['test_base_offload'])
 def test_cancel_incr_offload(global_config, setup):
     session = global_config.session
     resources = setup
     cancel_offload(session, resources)
 
-@pytest.mark.timeout(300)
-@pytest.mark.dependency(depends=['test_base_offload'])
-def test_base_restore(global_config, setup):
-    resources = setup
-    restore(resources['base_offload_session'], resources, global_config, "testbasefile1.dat", "test_base_restore")
-
-@pytest.mark.timeout(300)
-@pytest.mark.dependency(depends=['test_incr_offload'])
-def test_incr_restore(global_config, setup):
-    resources = setup
-    restore(resources['incr_offload_session'], resources, global_config, resources['incr_filename'],
-            "test_incr_restore")
 
 
