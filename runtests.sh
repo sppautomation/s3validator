@@ -17,7 +17,7 @@ fi
 
 if [ $1 == "scale" ]
 then
-../test_env/bin/pytest -v -x -s --junit-xml=test-results.xml  test_scale.py
+../test_env/bin/pytest -v -x -s --junit-xml=test-results.xml test_scale.py
 
 fi
 

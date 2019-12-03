@@ -1,0 +1,44 @@
+== Test execution
+
+Run the tests form the s3validator directory:
+
+* Functional:
+
+[source, bash]
+----
+$ ./runtests.sh functional
+----
+
+sample output:
+image:functionaloutput.png[functionaloutput]
+
+* Performance:
+
+[source, bash]
+----
+$ ./runtests.sh performance
+----
+sample output:
+image:scaleoutput.png[scaleoutput]
+
+* Scale:
+
+[source, bash]
+----
+$ ./runtests.sh scale
+
+----
+sample output:
+image:performanceoutput.png[performanceoutput]
+
+
+
+The script will print information on the console as it runs each
+test. Information about tests (such as APIs called and any errors) is
+saved in the following two files:
+
+* apiscalled.log
+* test-results.xml
+
+In case of any errors, please provide these files to IBM for
+debugging.

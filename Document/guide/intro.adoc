@@ -1,0 +1,25 @@
+== Introduction
+
+This document describes the automated functional and performance tests that you can
+run to validate that an S3 provider is compatible with the IBM Software cloud offload functionality.
+
+=== Advantages
+
+* quick check for the compatibility between the s3 provider and the IBM
+Software cloud offload functionality
+
+* performance overview
+
+* scalability potential
+
+=== Overview
+
+* Running these tests will verify that you can perform offload and restore from the S3
+provider using the IBM Software cloud offload functionality. There tests will allow you to measure
+the throughput for a single offload and restore. You can also analyse how the software handles scaling.
+
+
+
+
+
+

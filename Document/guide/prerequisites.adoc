@@ -1,0 +1,41 @@
+== Prerequisites
+
+* The test scripts will be run locally on a vSnap. To deploy and initialize a vSnap use the following link:
+
+
+
+** Install vSnap: https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_install_vsnap.html
+
+
+
+** Initialize vSnap: https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_config_vsnap_initialize.html
+
+
+
+** Expand vSnap pool (if needed): https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_expand_storage_pool.html
+
+* Install git on the vSnap to clone the s3validator repo. Running the following commands on the vSnap will give you access to
+the test scripts locally on your freshly deployed vSnap.
+
+[source, bash]
+----
+$ sudo apt-get install git
+
+$ git clone https://github.com/sppautomation/s3validator.git
+----
+
+
+* install environment to run the scripts.
+**  Run the script "install.sh" that is in the s3validator directory.
+** This will set up a Python virtual environment and will install some
+dependencies that are necessary to run tests. Note that packages will
+be installed into the newly created virtual environment so no changes
+will be made to host's software.
+
+[source, bash]
+----
+$ ./install.sh
+----
+
+
+
