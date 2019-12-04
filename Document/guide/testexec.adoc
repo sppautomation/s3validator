@@ -10,7 +10,7 @@ $ ./runtests.sh functional
 ----
 
 sample output:
-image:functionaloutput.png[functionaloutput]
+image:functionaloutput.png[Functional test output]
 
 * Performance:
 
@@ -19,7 +19,7 @@ image:functionaloutput.png[functionaloutput]
 $ ./runtests.sh performance
 ----
 sample output:
-image:scaleoutput.png[scaleoutput]
+image:scaleoutput.png[Scale test output]
 
 * Scale:
 
@@ -29,7 +29,7 @@ $ ./runtests.sh scale
 
 ----
 sample output:
-image:performanceoutput.png[performanceoutput]
+image:performanceoutput.png[Performance test output]
 
 
 

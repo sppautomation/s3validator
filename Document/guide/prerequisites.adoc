@@ -4,15 +4,15 @@
 
 
 
-** Install vSnap: https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_install_vsnap.html
+** Install vSnap: https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_install_vsnap.html[install]
 
 
 
-** Initialize vSnap: https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_config_vsnap_initialize.html
+** Initialize vSnap: https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_config_vsnap_initialize.html[initialize]
 
 
 
-** Expand vSnap pool (if needed): https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_expand_storage_pool.html
+** Expand vSnap pool (if needed): https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_expand_storage_pool.html[expand_pool]
 
 * Install git on the vSnap to clone the s3validator repo. Running the following commands on the vSnap will give you access to
 the test scripts locally on your freshly deployed vSnap.
