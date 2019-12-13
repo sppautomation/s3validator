@@ -1,4 +1,4 @@
-= Functional, Performance and Scale testing for S3 Provider
+= S3 Provider Validation
 for IBM Spectrum Protect Plus (DEVELOPMENT)
 :toc: left
 :toclevels: 3

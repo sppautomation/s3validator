@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
 <meta name="author" content="for IBM Spectrum Protect Plus (DEVELOPMENT)">
-<title>Functional, Performance and Scale testing for S3 Provider</title>
+<title>S3 Provider Validation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -440,27 +440,29 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
-<h1>Functional, Performance and Scale testing for S3 Provider</h1>
+<h1>S3 Provider Validation</h1>
 <div class="details">
 <span id="author" class="author">for IBM Spectrum Protect Plus (DEVELOPMENT)</span><br>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">1. Introduction</a>
+<li><a href="#_introduction">1. Introduction</a></li>
+<li><a href="#_basics">2. Basics</a></li>
+<li><a href="#_prerequisites">3. Prerequisites</a>
 <ul class="sectlevel2">
-<li><a href="#_advantages">1.1. Advantages</a></li>
-<li><a href="#_overview">1.2. Overview</a></li>
+<li><a href="#_initial_deployment">3.1. Initial deployment</a></li>
+<li><a href="#_configuring_storage">3.2. Configuring storage</a></li>
+<li><a href="#_setting_up_the_validation_test_scripts">3.3. Setting up the validation test scripts</a></li>
 </ul>
 </li>
-<li><a href="#_prerequisites">2. Prerequisites</a></li>
-<li><a href="#_configuration">3. Configuration</a>
+<li><a href="#_configuration">4. Configuration</a>
 <ul class="sectlevel2">
-<li><a href="#_configuring_s3_provider">3.1. Configuring S3 Provider</a></li>
-<li><a href="#_test_configuration">3.2. Test Configuration</a></li>
+<li><a href="#_configuring_s3_provider">4.1. Configuring S3 Provider</a></li>
+<li><a href="#_test_configuration">4.2. Test Configuration</a></li>
 </ul>
 </li>
-<li><a href="#_test_execution">4. Test execution</a></li>
+<li><a href="#_test_execution">5. Test execution</a></li>
 </ul>
 </div>
 </div>
@@ -486,43 +488,139 @@ The contents of this document and any attachments are strictly confidential and 
 <div class="sectionbody">
 <div class="paragraph">
 <p>This document describes the automated functional and performance tests that you can
-run to validate that an S3 provider is compatible with the IBM Software cloud offload functionality.</p>
+run to validate that a cloud object storage provider is compatible with IBM Spectrum Protect Plus.</p>
 </div>
-<div class="sect2">
-<h3 id="_advantages">1.1. Advantages</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>quick check for the compatibility between the s3 provider and the IBM
-Software cloud offload functionality</p>
-</li>
-<li>
-<p>performance overview</p>
-</li>
-<li>
-<p>scalability potential</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_overview">1.2. Overview</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>Running these tests will verify that you can perform offload and restore from the S3
-provider using the IBM Software cloud offload functionality. There tests will allow you to measure
-the throughput for a single offload and restore. You can also analyse how the software handles scaling.</p>
-</li>
-</ul>
-</div>
-<div style="page-break-after: always;"></div>
+<div class="paragraph">
+<p>Running these tests will verify that IBM Spectrum Protect Plus can successfully offload data to and restore from an S3-compatible storage provider. The tests will also allow you to measure performance and analyze how well the solution scales.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_prerequisites">2. Prerequisites</h2>
+<h2 id="_basics">2. Basics</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>IBM Spectrum Protect Plus (SPP) works by writing data to vSnap servers which serve as the primary backup destination. Data in vSnap servers can then be offloaded/copied to S3-compatible object storage providers using an incremental forever approach.</p>
+</div>
+<div class="paragraph">
+<p>A typical deployment usually consists of one SPP server which acts as the control plane, plus one or more vSnap servers which store data.</p>
+</div>
+<div class="paragraph">
+<p>SPP is distributed as a pre-built virtual appliance that can be deployed in VMware or Hyper-V environments. vSnap can be similarly deployed as a pre-built virtual appliance, or it can be installed on a custom physical or virtual Linux system that meets certain pre-requisites.</p>
+</div>
+<div class="paragraph">
+<p>In order to run the validation tests, you do not need to set up an SPP server, but you must at least install and configure a vSnap server, as described in the <code>Prerequisites</code> section.</p>
+</div>
+<div class="paragraph">
+<p>The validation tests work by generating a random set of data, writing it to the vSnap server&#8217;s disk-based storage pool, and then offloading/copying the data to the object storage. The tests also restore data by downloading it from object storage and verifying that its contents are valid.</p>
+</div>
+<div style="page-break-after: always;"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_prerequisites">3. Prerequisites</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Set up a vSnap server by deploying a virtual appliance or running the installer on a custom Linux system. For simplicity and ease of deployment, using the virtual appliance is highly recommended.</p>
+</div>
+<div class="paragraph">
+<p>Detailed instructions for installing, configuring, and managing a vSnap server can be found <a href="https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_install_vsnap.html">here</a>.</p>
+</div>
+<div class="paragraph">
+<p>The key steps required for configuring the vSnap server for the purpose of the validation tests are summarized below.</p>
+</div>
+<div class="sect2">
+<h3 id="_initial_deployment">3.1. Initial deployment</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Deploy the vSnap OVA in a VMware environment using the <code>Deploy OVF Template</code> option.</p>
+</li>
+<li>
+<p>Enter network properties for the virtual machine as part of the deployment wizard, or leave them blank to use DHCP. You can also set the network properties later once the virtual machine is up and running.</p>
+</li>
+<li>
+<p>Once deployment completes, power on the system and login using the default credentials:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Username: <code>serveradmin</code></p>
+</li>
+<li>
+<p>Password: <code>sppDP758-SysXyz</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Upon initial login, you are prompted to change the default password. Enter the default password first, then enter the new password twice. You may be forced to log out and log back in after changing the password.</p>
+</li>
+<li>
+<p>If you did not previously configure the network properties, you can do so now by running <code>sudo nmtui</code> or by other means if you are already familiar with Linux administration.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The <code>serveradmin</code> user has <code>sudo</code> privileges.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_configuring_storage">3.2. Configuring storage</h3>
+<div class="paragraph">
+<p>For the purpose of running the validation tests you must configure two storage areas:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The primary disk-based storage pool where data is initially written.</p>
+</li>
+<li>
+<p>A disk-based cache area where data is temporarily staged while it is being offloaded/copied from the primary storage pool to the object storage.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Primary storage pool</strong></p>
+</div>
+<div class="paragraph">
+<p>By default, the vSnap virtual appliance includes an unused 100 GB SCSI disk which can be used to create the storage pool. If you plan to run basic tests to verify functionality and/or measure performance using a data set that is smaller than 100 GB, it is sufficient to use the default disk to create the storage pool. If you plan to test with larger data sets, you may want to attach additional disks to create a larger storage pool.</p>
+</div>
+<div class="paragraph">
+<p>Run <code>vsnap disk show</code> to list disks and confirm that one or more unused disks are available. Sample output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[serveradmin@vsnap-vadp ~]$ vsnap disk show
+UUID                             | TYPE | VENDOR | MODEL        | SIZE     | USED AS     | KNAME | NAME
+-----------------------------------------------------------------------------------------------------------
+6000c299371bdcb647c80720602079bc | SCSI | VMware | Virtual disk | 70.00GB  | LVM2_member | sda   | /dev/sda
+6000c29b8ea25349e3a884d58f72e640 | SCSI | VMware | Virtual disk | 100.00GB | unused      | sdb   | /dev/sdb
+6000c297cb8078cf9f56ab688a326a24 | SCSI | VMware | Virtual disk | 128.00GB | LVM2_member | sdc   | /dev/sdc</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To use a storage pool larger than 100 GB, attach one or more additional disks to the system, run <code>vsnap disk rescan</code> and then rerun <code>vsnap disk show</code> to confirm that they are all recognized as being unused.</p>
+</div>
+<div class="paragraph">
+<p>To create a storage pool using all available unused disks, run <code>vsnap system init</code>. Afterwards, run <code>vsnap pool show</code> to confirm that a storage pool has been created.</p>
+</div>
+<div class="paragraph">
+<p><strong>Cache area</strong></p>
+</div>
+<div class="paragraph">
+<p>TODO</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_setting_up_the_validation_test_scripts">3.3. Setting up the validation test scripts</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -582,8 +680,9 @@ will be made to host&#8217;s software.</p>
 <div style="page-break-after: always;"></div>
 </div>
 </div>
+</div>
 <div class="sect1">
-<h2 id="_configuration">3. Configuration</h2>
+<h2 id="_configuration">4. Configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The test scripts are divided into three categories as follows:</p>
@@ -602,7 +701,7 @@ will be made to host&#8217;s software.</p>
 </ol>
 </div>
 <div class="sect2">
-<h3 id="_configuring_s3_provider">3.1. Configuring S3 Provider</h3>
+<h3 id="_configuring_s3_provider">4.1. Configuring S3 Provider</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -640,7 +739,7 @@ provider. To do this, edit the following file:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_test_configuration">3.2. Test Configuration</h3>
+<h3 id="_test_configuration">4.2. Test Configuration</h3>
 <div class="paragraph">
 <p>In directory tests update the pytest.ini file to set the offload size in MB&#8217;s. Following are the fields you can configure, the default values are
 mentioned for reference.</p>
@@ -699,7 +798,7 @@ mentioned for reference.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_test_execution">4. Test execution</h2>
+<h2 id="_test_execution">5. Test execution</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Run the tests form the s3validator directory:</p>
@@ -776,7 +875,7 @@ debugging.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-12-03 20:37:31 UTC
+Last updated 2019-12-13 11:46:33 -0500
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

@@ -1,25 +1,20 @@
 == Introduction
 
 This document describes the automated functional and performance tests that you can
-run to validate that an S3 provider is compatible with the IBM Software cloud offload functionality.
+run to validate that a cloud object storage provider is compatible with IBM Spectrum Protect Plus.
 
-=== Advantages
+Running these tests will verify that IBM Spectrum Protect Plus can successfully offload data to and restore from an S3-compatible storage provider. The tests will also allow you to measure performance and analyze how well the solution scales.
 
-* quick check for the compatibility between the s3 provider and the IBM
-Software cloud offload functionality
+== Basics
 
-* performance overview
+IBM Spectrum Protect Plus (SPP) works by writing data to vSnap servers which serve as the primary backup destination. Data in vSnap servers can then be offloaded/copied to S3-compatible object storage providers using an incremental forever approach.
 
-* scalability potential
+A typical deployment usually consists of one SPP server which acts as the control plane, plus one or more vSnap servers which store data.
 
-=== Overview
+SPP is distributed as a pre-built virtual appliance that can be deployed in VMware or Hyper-V environments. vSnap can be similarly deployed as a pre-built virtual appliance, or it can be installed on a custom physical or virtual Linux system that meets certain pre-requisites.
 
-* Running these tests will verify that you can perform offload and restore from the S3
-provider using the IBM Software cloud offload functionality. There tests will allow you to measure
-the throughput for a single offload and restore. You can also analyse how the software handles scaling.
+In order to run the validation tests, you do not need to set up an SPP server, but you must at least install and configure a vSnap server, as described in the `Prerequisites` section.
 
-
-
-
+The validation tests work by generating a random set of data, writing it to the vSnap server's disk-based storage pool, and then offloading/copying the data to the object storage. The tests also restore data by downloading it from object storage and verifying that its contents are valid.
 
 
