@@ -1,3 +1,4 @@
+<<<
 == Configuration
 
 The test scripts are divided into three categories as follows:

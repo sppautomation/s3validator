@@ -78,7 +78,7 @@ class CommandTimeoutError(Exception):
         super().__init__(msg)
 
 
-def run_shell_command(command, cmd_input=None, use_sudo=False, sudo_user="root", sudo_login=False, timeout=480,
+def run_shell_command(command, cmd_input=None, use_sudo=False, sudo_user="root", sudo_login=False, timeout=28800,
                       ignore_error=False, log_error_as=logging.WARN, log_cmd_as=logging.DEBUG, output_to_file=False,
                       mask_text=[], use_stdout=False, pidfile=None):
     outfile_name = "/tmp/bdg-%s-%s-out.txt" % (os.getpid(), int(time.time()))
