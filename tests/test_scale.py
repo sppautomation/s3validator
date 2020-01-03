@@ -20,33 +20,27 @@ base_file_size_MB = int(config.get('scale_test', 'base_file_size_MB'))
 max_vsnap_streams = int(config.get('scale_test', 'max_vsnap_streams'))
 
 analysis_offload = PrettyTable()
-analysis_offload.field_names = ["Offload count", "Total Time (seconds)", "Max streams", "Each offload size (MB's)"]
+analysis_offload.field_names = ["Offload count", "Max streams", "Total Time ", "Total offload size", "Average offload time (sec)", "Average throughput((MB/s))" ]
 
 @pytest.fixture(scope="module")
 def setup(global_config, request):
     resources = {}
     resources['relationships'] = []
-    resources['partners'] = []
+    resources['partner'] = []
     resources['shares'] = []
     resources['volumes'] = []
     resources['mountpoints'] = []
     resources['offload_sessions'] = []
-    resources['total_offload_time'] = 0
+    resources['total_offload_time'] = 1
+    resources['start_time'] = time.time()
+    resources["total_offload_size"] = 1
     request.addfinalizer(lambda: cleanup(global_config, resources))
 
     return resources
 
 def cleanup(global_config, resources):
-
-
     session = global_config.session
 
-    analysis_offload.add_row([count_of_offloads, resources['total_offload_time'], max_vsnap_streams, base_file_size_MB])
-    print("\n\n")
-    print(analysis_offload)
-    # print("File size used for offloads: {}".format(base_file_size_MB))
-    # print("Total number of offloads: {}".format(count_of_offloads))
-    # print("Total time taken for all offloads is: {} minutes".format(resources['total_offload_time'] / 60))
 
     if resources['mountpoints']:
         for mount in resources['mountpoints']:
@@ -74,6 +68,21 @@ def cleanup(global_config, resources):
     client.VsnapAPI(session, '/api/pref').delete(
         resid="cloudMaxStreams")
 
+    total_time = time.time() - resources['start_time']
+    resources['total_offload_time'] = total_time
+    avg_throughput = (resources['total_offload_size']/(1000*1000)) / int(total_time)
+    avg_offload_time =  time.strftime("%H:%M:%S", time.gmtime(int(total_time) / count_of_offloads))
+    size = util.get_offload_size(resources['total_offload_size'])
+    resources['total_offload_time'] = time.strftime("%H:%M:%S", time.gmtime(total_time))
+
+
+    analysis_offload.add_row([count_of_offloads, max_vsnap_streams,
+                              resources['total_offload_time'], size,
+                              avg_offload_time,
+                              "{:.2f}".format(float(avg_throughput))])
+    print("\n\n")
+    print(analysis_offload)
+
 
 def monitor_sync_session(clientsess, sync_id):
     while True:
@@ -81,6 +90,7 @@ def monitor_sync_session(clientsess, sync_id):
 
         offload_session = client.VsnapAPI(clientsess, 'session').get(path=sync_id + "?partner_type=cloud")
         status = offload_session['status'];
+
 
         if status in ["COMPLETED", "FAILED"]:
             return offload_session
@@ -168,24 +178,16 @@ def test_createmulti_offloads(count, global_config, setup):
 
 @pytest.mark.parametrize("count", range(count_of_offloads))
 def test_multioffload_status(count, global_config, setup):
-    start_time = time.time()
+
     session = global_config.session
     resources = setup
 
     offload_session = monitor_sync_session(session, resources['offload_sessions'][count]['id'])
+    resources['total_offload_size'] += offload_session['size_sent']
 
     print("\n Offload session status for session id {} is {}".format(offload_session['id'],offload_session['status']))
     if offload_session['status'] == "FAILED":
         print(offload_session['message'])
-
-    queued = offload_session['time_queued']
-
-    end = offload_session['time_ended']
-
-    total_time = float(end) - float(queued)
-    print("Offload time = {} seconds".format(total_time))
-    resources['total_offload_time'] += total_time
-
 
     assert offload_session['status'] == "COMPLETED"
 

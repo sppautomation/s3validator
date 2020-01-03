@@ -23,8 +23,8 @@ def title_txt(txt): print('\x1b[5;30;42m' + txt + '\x1b[0m')
 
 analysis_offload = PrettyTable()
 analysis_restore = PrettyTable()
-analysis_offload.field_names = ["Job Type", "Time taken", "Throughput (per sec)", "Size"]
-analysis_restore.field_names = ["Job Type", "Time taken", "Size MB"]
+analysis_offload.field_names = ["Job Type", "Time taken", "Throughput (MB/s)", "Size"]
+analysis_restore.field_names = ["Job Type", "Time taken", "Size", "Throughput (MB/s)"]
 
 @pytest.fixture(scope="module")
 def setup(global_config, request):
@@ -127,34 +127,17 @@ def monitor_sync_session(clientsess, sync_id):
         # print("Session details: {}".format(offload_session))
 
         if status in ["COMPLETED", "FAILED"]:
-            size_value = ""
-            size = ""
             if offload_session['action'] == 'upload':
-                if offload_session['size_sent'] > (1024*1024*1024*1024):
-                    size = offload_session['size_sent']/(1024*1024*1024*1024)
-                    size_value = "TB"
-                elif offload_session['size_sent'] > (1024*1024*1024):
-                    size = offload_session['size_sent']/(1024*1024*1024)
-                    size_value = "GB"
-                elif offload_session['size_sent'] > (1024*1024):
-                    size = offload_session['size_sent']/(1024*1024)
-                    size_value = "MB"
-                elif offload_session['size_sent'] > (1024):
-                    size = offload_session['size_sent']/(1024)
-                    size_value = "KB"
-                else:
-                    size = offload_session['size_sent']
-                    size_value = "Bytes"
+                size = util.get_offload_size(offload_session['size_sent'])
 
                 print("\n")
                 title_txt("OFFLOAD:")
 
                 time_taken = int(offload_session['time_ended']) - int(offload_session['time_started'])
                 t = str(datetime.timedelta(seconds=time_taken))
-                throughput = str(round(size / time_taken, 2))
+                throughput = str(round(offload_session['size_sent'] / time_taken, 2))
 
-                analysis_offload.add_row(["Offload", "{} (hh:mm:ss)".format(t), "{} {}".format(throughput, size_value),
-                                          "{} {}".format(str(round(size,2)), size_value)] )
+                analysis_offload.add_row(["Offload", "{} (hh:mm:ss)".format(t), throughput, size])
                 print(analysis_offload)
             return offload_session
 
@@ -215,11 +198,13 @@ def restore(offload_session, resources, global_config, filename, vol_name):
                                  use_sudo=True)
         elapsed_restore_time = time.time() - start_time
         t = str(datetime.timedelta(seconds=elapsed_restore_time))
+        size = util.get_offload_size(base_file_size_MB * 1000 * 1000)
+        throughput = str(round(base_file_size_MB / elapsed_restore_time, 2))
 
         print("\n")
         title_txt("RESTORE:")
 
-        analysis_restore.add_row(["Restore", "{} (hh:mm:ss)".format(t), "{}".format(base_file_size_MB)])
+        analysis_restore.add_row(["Restore", "{} (hh:mm:ss)".format(t), size, throughput])
         print(analysis_restore)
 
 

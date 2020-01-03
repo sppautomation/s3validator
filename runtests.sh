@@ -11,13 +11,13 @@ fi
 
 if [ $1 == "performance" ]
 then
-../test_env/bin/pytest -v -x -s --junit-xml=test-results.xml   test_performance.py
+../test_env/bin/pytest -v -x -s --serverurl=$2  --username=$3 --password=$4 --junit-xml=test-results.xml  test_performance.py
 
 fi
 
 if [ $1 == "scale" ]
 then
-../test_env/bin/pytest -v -x -s --junit-xml=test-results.xml test_scale.py
+../test_env/bin/pytest -v -x -s --serverurl=$2  --username=$3 --password=$4 --junit-xml=test-results.xml test_scale.py
 
 fi
 

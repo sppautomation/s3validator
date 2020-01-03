@@ -81,6 +81,9 @@ def global_config(pytestconfig):
     username = os.getenv('username')
     password = os.getenv('password')
     session = client.VsnapSession(os.getenv('serverurl'), os.getenv('username'), os.getenv('password'))
+    print("Serverurl:{}".format(os.getenv('serverurl')))
+    print("Username:{}".format(os.getenv('username')))
+    print("Password:{}".format(os.getenv('password')))
     vsnap_init(session)
     resp = client.VsnapAPI(session, 'pool').get()
     pool_id = resp['pools'][0]['id']
