@@ -10,7 +10,7 @@ for IBM Spectrum Protect Plus
 // For displaying images in GitHub, we need to specify the absolute URL
 // for the images directory. For everything else, we specify a relative path.
 ifdef::env-github[]
-:imagesdir: https://raw.githubusercontent.com/SidBB/s3validator/sidbb_doc/Document/images/IBM-logo.png
+:imagesdir: https://raw.githubusercontent.com/SidBB/s3validator/sidbb_doc/Document/images
 endif::[]
 ifndef::env-github[]
 :imagesdir: ./images
