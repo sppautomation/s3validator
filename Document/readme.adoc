@@ -1,11 +1,5 @@
-= IBM Spectrum Protect Plus: Validation of S3 Cloud Object Storage Providers
-:toc: left
-:toclevels: 3
-:icons: font
-:pagenums:
-:sectnums:
-:pdf-page-size: letter
-:source-highlighter: highlight.js
+= S3 Object Storage Provider Validation
+for IBM Spectrum Protect Plus
 // For displaying images in GitHub, we need to specify the absolute URL
 // for the images directory. For everything else, we specify a relative path.
 ifdef::env-github[]
@@ -14,10 +8,20 @@ endif::[]
 ifndef::env-github[]
 :imagesdir: ./images
 endif::[]
+:doctype: book
+:toc: left
+:toclevels: 3
+:icons: font
+:pagenums:
+:sectnums:
+:pdf-page-size: letter
+:source-highlighter: highlight.js
 
 image::IBM-logo.png[IBM-logo]
 
-NOTE: Copyright 2019 IBM | All rights reserved. The contents of this document and any attachments are strictly confidential and are supplied on the understanding that they will be held confidentially and not disclosed to third parties without the prior written consent of IBM.
+NOTE: Copyright 2019 IBM. All rights reserved. The contents of this document and any attachments are strictly confidential and are supplied on the understanding that they will be held confidentially and not disclosed to third parties without the prior written consent of IBM.
+
+<<<
 
 == Introduction
 
@@ -25,6 +29,8 @@ This document describes the automated functional and performance tests that you 
 run to validate that a cloud object storage provider is compatible with IBM Spectrum Protect Plus.
 
 Running these tests will verify that IBM Spectrum Protect Plus can successfully offload data to and restore from an S3-compatible storage provider. The tests will also allow you to measure performance and analyze how well the solution scales.
+
+<<<
 
 == Basics
 
