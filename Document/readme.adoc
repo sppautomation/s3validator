@@ -1,5 +1,4 @@
-= S3 Provider Validation
-for IBM Spectrum Protect Plus
+= IBM Spectrum Protect Plus: Validation of S3 Cloud Object Storage Providers
 :toc: left
 :toclevels: 3
 :icons: font
@@ -18,13 +17,7 @@ endif::[]
 
 image::IBM-logo.png[IBM-logo]
 
-----
-
-Copyright 2019 IBM | All rights reserved | Confidential
-
-The contents of this document and any attachments are strictly confidential and are supplied on the understanding that they will be held confidentially and not disclosed to third parties without the prior written consent of IBM.
-
-----
+NOTE: Copyright 2019 IBM | All rights reserved. The contents of this document and any attachments are strictly confidential and are supplied on the understanding that they will be held confidentially and not disclosed to third parties without the prior written consent of IBM.
 
 == Introduction
 
