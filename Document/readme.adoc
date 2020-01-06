@@ -57,14 +57,22 @@ The key steps required for configuring the vSnap server for the purpose of the v
 === Initial deployment
 
 * Deploy the vSnap OVA in a VMware environment using the `Deploy OVF Template` option.
-* Enter network properties for the virtual machine as part of the deployment wizard, or leave them blank to use DHCP. You can also set the network properties later once the virtual machine is up and running.
-* Once deployment completes, power on the system and login using the default credentials:
+* Enter network properties for the virtual machine as part of the deployment wizard, or leave them blank to use DHCP. You can also configure the network properties at a later time once the virtual machine is up and running.
+* Once deployment completes, before powering on the virtual machine, edit its settings to adjust the virtual hardware. The following values are recommended for a system intended for the validation tests:
+** Number of vCPUs: 8
+** Total Memory: 40 GB
+** Number of network adapters: 1
+** Note: Using a 10 Gbit network adapter is recommended.
+* Power on the virtual machine and login using the default credentials:
 ** Username: `serveradmin`
 ** Password: `sppDP758-SysXyz`
 * Upon initial login, you are prompted to change the default password. Enter the default password first, then enter the new password twice. You may be forced to log out and log back in after changing the password.
-* If you did not previously configure the network properties, you can do so now by running `sudo nmtui` or by other means if you are already familiar with Linux administration.
 
 NOTE: The `serveradmin` user has `sudo` privileges.
+
+=== Configuring network
+
+If you did not previously configure the network properties, you can do so by running `sudo nmtui` while logged in as the `serveradmin` user.
 
 === Configuring storage
 
@@ -77,20 +85,55 @@ For the purpose of running the validation tests you must configure two storage a
 
 By default, the vSnap virtual appliance includes an unused 100 GB SCSI disk which can be used to create the storage pool. If you plan to run basic tests to verify functionality and/or measure performance using a data set that is smaller than 100 GB, it is sufficient to use the default disk to create the storage pool. If you plan to test with larger data sets, you may want to attach additional disks to create a larger storage pool.
 
-Run `vsnap disk show` to list disks and confirm that one or more unused disks are available. Sample output:
+Run `vsnap disk show` to list disks and confirm that one or more unused disks are available. The sample output below shows one unused 100 GB disk (`/dev/sdb`):
 
 ----
-[serveradmin@vsnap-vadp ~]$ vsnap disk show
+[serveradmin@vsnap ~]$ vsnap disk show
 UUID                             | TYPE | VENDOR | MODEL        | SIZE     | USED AS     | KNAME | NAME
 -----------------------------------------------------------------------------------------------------------
-6000c299371bdcb647c80720602079bc | SCSI | VMware | Virtual disk | 70.00GB  | LVM2_member | sda   | /dev/sda
-6000c29b8ea25349e3a884d58f72e640 | SCSI | VMware | Virtual disk | 100.00GB | unused      | sdb   | /dev/sdb
-6000c297cb8078cf9f56ab688a326a24 | SCSI | VMware | Virtual disk | 128.00GB | LVM2_member | sdc   | /dev/sdc
+6000c29c116da8f495b2039fcd7fa3c3 | SCSI | VMware | Virtual disk | 70.00GB  | LVM2_member | sda   | /dev/sda
+6000c293f48c897ded5c3b50afb7ca28 | SCSI | VMware | Virtual disk | 100.00GB | unused      | sdb   | /dev/sdb
+6000c294c22b7968054789932dcf6621 | SCSI | VMware | Virtual disk | 128.00GB | LVM2_member | sdc   | /dev/sdc
 ----
 
 To use a storage pool larger than 100 GB, attach one or more additional disks to the system, run `vsnap disk rescan` and then rerun `vsnap disk show` to confirm that they are all recognized as being unused.
 
-To create a storage pool using all available unused disks, run `vsnap system init`. Afterwards, run `vsnap pool show` to confirm that a storage pool has been created.
+To create a storage pool using all available unused disks, run `vsnap system init`.
+
+Afterwards, run `vsnap pool show` to confirm that a storage pool has been created.
+
+Sample output:
+
+----
+[serveradmin@vsnap ~]$ vsnap pool show
+TOTAL: 1
+
+ID: 1
+NAME: primary
+POOL TYPE: raid0
+STATUS: ONLINE
+HEALTH: 100
+COMPRESSION: Yes
+COMPRESSION RATIO: 1.00
+DEDUPLICATION: No
+DEDUPLICATION RATIO: 1.00
+ENCRYPTION:
+    ENABLED: No
+
+TOTAL SPACE: 99.99GB
+FREE SPACE: 96.39GB
+USED SPACE: 3.60GB
+DATA SIZE BEFORE DEDUPLICATION: 134.50KB
+DATA SIZE BEFORE COMPRESSION: 53.50KB
+CREATED: 2020-01-06 20:19:33 UTC
+UPDATED: 2020-01-06 20:19:33 UTC
+DISKS PER RAID GROUP: 1
+DISKS IN POOL:
+    RAID0:
+        /dev/sdb1
+----
+
+
 
 *Cache area*
 
