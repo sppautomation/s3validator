@@ -83,9 +83,11 @@ For the purpose of running the validation tests you must configure two storage a
 
 *Primary storage pool*
 
+The primary storage pool is the data repository where backup data is written. On a freshly installation of vSnap, no storage pool exists. As part of the vSnap initialization process, the pool is created using one or more SCSI disks.
+
 By default, the vSnap virtual appliance includes an unused 100 GB SCSI disk which can be used to create the storage pool. If you plan to run basic tests to verify functionality and/or measure performance using a data set that is smaller than 100 GB, it is sufficient to use the default disk to create the storage pool. If you plan to test with larger data sets, you may want to attach additional disks to create a larger storage pool.
 
-Run `vsnap disk show` to list disks and confirm that one or more unused disks are available. The sample output below shows one unused 100 GB disk (`/dev/sdb`):
+Run `vsnap disk show` to list disks and confirm that one or more unused SCSI disks are available. The sample output below shows one unused 100 GB disk (`/dev/sdb`):
 
 ----
 [serveradmin@vsnap ~]$ vsnap disk show
@@ -98,7 +100,7 @@ UUID                             | TYPE | VENDOR | MODEL        | SIZE     | USE
 
 To use a storage pool larger than 100 GB, attach one or more additional disks to the system, run `vsnap disk rescan` and then rerun `vsnap disk show` to confirm that they are all recognized as being unused.
 
-To create a storage pool using all available unused disks, run `vsnap system init`.
+To initialize the vSnap system, run `vsnap system init`. As part of the initialization process, vSnap creates a storage pool using all available unused disks
 
 Afterwards, run `vsnap pool show` to confirm that a storage pool has been created.
 
@@ -133,11 +135,9 @@ DISKS IN POOL:
         /dev/sdb1
 ----
 
-
-
 *Cache area*
 
-TODO
+By default, the vSnap virtual appliance includes a 128 GB XFS filesystem mounted at `/opt/vsnap-data` which is used as the cache area. If you plan to run basic tests to verify functionality and/or measure performance using a data set that is smaller than 100 GB, it is sufficient to use the default disk to create the storage pool. If you plan to test with larger data sets, you may want to attach additional disks to create a larger storage pool.
 
 === Setting up the validation test scripts
 
