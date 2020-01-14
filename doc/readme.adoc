@@ -207,6 +207,32 @@ Once the installation is complete, you are ready to configure and run the valida
 
 == Usage
 
+=== Overview
+
+The test suite consists of the following categories of tests. The next few sections of this document describe the detailed configuration for driving these tests.
+
+*Functional test*
+
+This test evaluates the basic functionality of the offload feature.
+
+The test uploads data to the S3 endpoint in multiple iterations starting with a larger base offload followed by a few smaller incremental offloads. The test also verifies downloads by restoring the data from each iteration.
+
+Since this test is designed to validate basic functionality, by default it is configured to transfer a relatively small amount of data.
+
+*Performance test*
+
+This test evaluates the performance of the offload feature.
+
+The test performs a single upload session to the S3 endpoint and measures the write throughput. It also verifies downloads by restoring the data and measuring the read throughput.
+
+Since the goal of this test is to measure throughput, by default it is configured to transfer a larger amount of data compared to the functional test.
+
+*Scale test*
+
+This test evaluates the performance and scalability of the offload feature by driving multiple concurrent offload operations.
+
+The test performs multiple uploads sessions to the S3 endpoint concurrently and measures the average write throughput. The test can be repeated with different concurrency settings to evaluate how the performance scales as the number of sessions increases.
+
 === Configure the cloud endpoint
 
 Before running the test suite, you must configure it to provide details regarding the S3 endpoint you want to test against.
