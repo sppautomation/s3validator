@@ -2,12 +2,12 @@
 for IBM Spectrum Protect Plus
 // For displaying images in GitHub, we need to specify the absolute URL
 // for the images directory. For everything else, we specify a relative path.
-ifdef::env-github[]
-:imagesdir: https://raw.githubusercontent.com/SidBB/s3validator/sidbb_doc/doc/images
-endif::[]
-ifndef::env-github[]
-:imagesdir: ./images
-endif::[]
+// ifdef::env-github[]
+// :imagesdir: https://raw.githubusercontent.com/SidBB/s3validator/sidbb_doc/doc/images
+// endif::[]
+// ifndef::env-github[]
+// :imagesdir: ./images
+// endif::[]
 :doctype: book
 :toc: left
 :toclevels: 3
@@ -17,9 +17,7 @@ endif::[]
 :pdf-page-size: letter
 :source-highlighter: highlight.js
 
-image::IBM-logo.png[IBM-logo]
-
-NOTE: Copyright 2019 IBM. All rights reserved. The contents of this document and any attachments are strictly confidential and are supplied on the understanding that they will be held confidentially and not disclosed to third parties without the prior written consent of IBM.
+NOTE: Copyright 2019 IBM Corp. All rights reserved. The contents of this document and any attachments are strictly confidential and are supplied on the understanding that they will be held confidentially and not disclosed to third parties without the prior written consent of IBM.
 
 WARNING: Draft document. This is a work-in-progress.
 
@@ -209,49 +207,50 @@ Once the installation is complete, you are ready to configure and run the valida
 
 == Usage
 
-=== Configure the test suite
+=== Configure the cloud endpoint
 
-TODO
+Before running the test suite, you must configure it to provide details regarding the S3 endpoint you want to test against.
 
+To configure the endpoint details, modify the file `/home/serveradmin/s3validator/tests/config/cloud_endpoint.json` and update the values.
 
+Sample contents:
 
-
-* The test scripts will be run locally on a vSnap. To deploy and initialize a vSnap use the following link:
-
-
-
-** Install vSnap: https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_install_vsnap.html[install]
-
-
-
-** Initialize vSnap: https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_config_vsnap_initialize.html[initialize]
-
-
-
-** Expand vSnap pool (if needed): https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_expand_storage_pool.html[expand_pool]
-
-* Install git on the vSnap to clone the s3validator repo. Running the following commands on the vSnap will give you access to
-the test scripts locally on your freshly deployed vSnap.
-
-[source, bash]
 ----
-$ sudo apt-get install git
-
-$ git clone https://github.com/sppautomation/s3validator.git
+{
+    "endpoint": "https://s3.example.com",
+    "api_key": "xxxxxxxx",
+    "api_secret": "yyyyyyyy",
+    "bucket": "sample-bucket",
+    "provider": "generic"
+}
 ----
 
+Fields in `cloud_endpoint.json`:
 
-* install environment to run the scripts.
-**  Run the script "install.sh" that is in the s3validator directory.
-** This will set up a Python virtual environment and will install some
-dependencies that are necessary to run tests. Note that packages will
-be installed into the newly created virtual environment so no changes
-will be made to host's software.
+[cols="30%a,70%a", options="header"]
+|====
+|Field|Description
+|`endpoint`|Specify the endpoint URL to be used for the tests. The URL must include the prefix `http://` or `https://`. For example: `https://s3.amazonaws.com`.
+|`api_key`|Specify the Access Key for the endpoint.
+|`api_secret`|Specify the Secret Key for the endpoint.
+|`bucket`|Specify the name of the bucket that will be used for the tests.
+|`provider`|Specify the provider type of the endpoint. Valid values:
+* `cos`: IBM Cloud Object Storage
+* `sp`: IBM Spectrum Protect
+* `aws`: Amazon S3
+* `azure`: Microsoft Azure Blob Storage
+* `generic`: Any other S3-compatible endpoint
+|====
 
-[source, bash]
-----
-$ ./install.sh
-----
+=== Configure the test parameters
+
+
+
+Before running the test suite,
+
+
+
+
 
 
 
