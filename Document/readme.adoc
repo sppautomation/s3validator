@@ -161,7 +161,7 @@ Finally, run `df -h` and verify that the volume `/opt/vsnap-data` is mounted and
 
 <<<
 
-=== Install and configure the test tools
+== Install and configure the test tools
 
 
 
