@@ -211,7 +211,11 @@ Once the installation is complete, you are ready to configure and run the valida
 
 Before running the test suite, you must configure it to provide details regarding the S3 endpoint you want to test against.
 
-To configure the endpoint details, modify the file `/home/serveradmin/s3validator/tests/config/cloud_endpoint.json` and update the values.
+To configure the endpoint details, modify the following file and edit the values:
+
+----
+/home/serveradmin/s3validator/tests/config/cloud_endpoint.json
+----
 
 Sample contents:
 
@@ -235,11 +239,13 @@ Fields in `cloud_endpoint.json`:
 |`api_secret`|Specify the Secret Key for the endpoint.
 |`bucket`|Specify the name of the bucket that will be used for the tests.
 |`provider`|Specify the provider type of the endpoint. Valid values:
+
 * `cos`: IBM Cloud Object Storage
 * `sp`: IBM Spectrum Protect
 * `aws`: Amazon S3
 * `azure`: Microsoft Azure Blob Storage
 * `generic`: Any other S3-compatible endpoint
+
 |====
 
 === Configure the test parameters

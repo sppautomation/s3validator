@@ -1,9 +1,7 @@
-
 {
-  "endpoint": "https://s3-.net",
-    "api_key": "a992aXXXXXXXXXX0a123a7a",
-    "api_secret": "4159XXXXXXXXXXXX504a6e1",
-    "bucket": "test",
+    "endpoint": "https://s3.example.com",
+    "api_key": "xxxxxxxx",
+    "api_secret": "yyyyyyyy",
+    "bucket": "sample-bucket",
     "provider": "generic"
-
 }
