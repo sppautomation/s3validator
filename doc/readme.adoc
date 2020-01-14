@@ -21,6 +21,8 @@ image::IBM-logo.png[IBM-logo]
 
 NOTE: Copyright 2019 IBM. All rights reserved. The contents of this document and any attachments are strictly confidential and are supplied on the understanding that they will be held confidentially and not disclosed to third parties without the prior written consent of IBM.
 
+WARNING: Draft document. This is a work-in-progress.
+
 <<<
 
 == Introduction
@@ -54,7 +56,7 @@ Detailed instructions for installing, configuring, and managing a vSnap server c
 
 The key steps required for configuring the vSnap server for the purpose of the validation tests are summarized below.
 
-=== Initial deployment
+=== Deploy the vSnap virtual appliance
 
 * Deploy the vSnap OVA in a VMware environment using the `Deploy OVF Template` option.
 * Enter network properties for the virtual machine as part of the deployment wizard, or leave them blank to use DHCP. You can also configure the network properties at a later time once the virtual machine is up and running.
@@ -62,7 +64,6 @@ The key steps required for configuring the vSnap server for the purpose of the v
 ** Number of vCPUs: 8
 ** Total Memory: 40 GB
 ** Number of network adapters: 1
-** Note: Using a 10 Gbit network adapter is recommended.
 * Power on the virtual machine and login using the default credentials:
 ** Username: `serveradmin`
 ** Password: `sppDP758-SysXyz`
@@ -70,11 +71,13 @@ The key steps required for configuring the vSnap server for the purpose of the v
 
 NOTE: The `serveradmin` user has `sudo` privileges.
 
-=== Configuring network
+=== Configure network settings
 
 If you did not previously configure the network properties, you can do so by running `sudo nmtui` while logged in as the `serveradmin` user.
 
-=== Configuring storage
+NOTE: Using a 10 Gbit network adapter is recommended.
+
+=== Configure storage
 
 For the purpose of running the validation tests you must configure two storage areas:
 
@@ -161,8 +164,54 @@ Finally, run `df -h` and verify that the volume `/opt/vsnap-data` is mounted and
 
 <<<
 
-== Install and configure the test tools
+== Installation
 
+=== Download and install the test suite
+
+*TODO*: Update this section before release to recommend using `wget <url>` pointing to a stable release instead of `git clone <url>`.
+
+Run the following commands as the `serveradmin` user. This will install `git`, install the most up-to-date SSL certificates, and then clone the Git repository containing the test suite.
+
+----
+sudo yum --enablerepo=base,updates install git
+sudo yum --enablerepo=base,updates reinstall ca-certificates
+cd ~
+git clone https://github.com/sppautomation/s3validator.git
+----
+
+The repository is downloaded to the directory `s3validator` under your home directory.
+
+NOTE: If a previous version of the directory `s3validator` already exists, remove it first using `rm -rf s3validator` before using the `git clone` command above.
+
+Then, invoke the installation script:
+
+----
+cd ~/s3validator
+./install.sh
+----
+
+Sample output:
+
+----
+Creating virtual environment under: /home/serveradmin/s3validator_venv
+Installing dependencies
+
+[Output truncated]
+
+Installation complete
+----
+
+The installation script creates a Python virtual environment in `s3validator_venv` under your home directory, then downloads and installs some dependencies in the virtual environment. If an existing `s3validator_env` directory is found, the installer removes it and creates a new one.
+
+Once the installation is complete, you are ready to configure and run the validation tests.
+
+<<<
+
+== Usage
+
+=== Configure the test suite
+
+TODO
 
 
 
