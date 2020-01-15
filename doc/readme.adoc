@@ -346,57 +346,19 @@ Note that increasing the number of workers causes CPU, memory, and network usage
 
 === Run the test suite
 
-To run the
-
-
-
-<<<
-
-== Old content
-
-Run the tests form the s3validator directory:
-
-* Functional:
-
-[source, bash]
-----
-$ ./runtests.sh functional
-----
-
-sample output:
-image:functionaloutput.png[Functional test output]
-
-* Performance:
-
-[source, bash]
-----
-$ ./runtests.sh performance
-----
-sample output:
-image:scaleoutput.png[Scale test output]
-
-* Scale:
-
-[source, bash]
-----
-$ ./runtests.sh scale
+To invoke the test suite, run:
 
 ----
-sample output:
-image:performanceoutput.png[Performance test output]
+s3validator/runtests.sh <test_type> https://localhost:8900 <username> <password>
+----
 
+`<test_type>`: Specify `functional`, `performance`, or `scale`.
 
+`<username>`: Specify the username of the API user created earlier.
 
-The script will print information on the console as it runs each
-test. Information about tests (such as APIs called and any errors) is
-saved in the following two files:
+`<password>`: Specify the password of the API user created earlier.
 
-* apiscalled.log
-* test-results.xml
+NOTE: Depending on the type of the test and the data sizes involved, the command above may take a long time to complete, ranging from several minutes to several hours. If a test doesn't complete within a certain timeout period, the test is aborted. The default timeout is `86400` seconds (24 hours) but it can be modified in `pytest.ini`.
 
-In case of any errors, please provide these files to IBM for
-debugging.
-
-
-
+*TODO*: Update this section to add details about how test results are logged. At present most info is logged to stdout and a few additional details are logged in files created under the `s3validator` directory which are overwritten with every test run. We need to enhance this such that: (1) the stdout is also logged to a file, and (2) each test run creates its output files in some unique directory e.g. named `results_<timestamp>`.
 
