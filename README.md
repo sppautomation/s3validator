@@ -1,12 +1,5 @@
 # s3validator
 
+This repository contains the automated functional and performance tests that you can run to validate that a cloud object storage provider is compatible with IBM Spectrum Protect Plus.
 
-## Introduction
-
-This directory contains tests that can be used to verify if IBM
-Software cloud offload functionality works with a given S3
-provider, performance analysis and scalability.
-
-## Documentation
-
-Refer s3validator_documentation.adoc for getting started.
+Refer to the `doc` directory for detailed documentation.

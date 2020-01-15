@@ -1,9 +1,24 @@
 #!/bin/bash
 
-set -x
 set -e
 
-python3 -m venv test_env
-./test_env/bin/pip install -r requirements.txt >/dev/null
-./test_env/bin/pip install -e client >/dev/null
+MYDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENVDIR=${MYDIR}_venv
 
+echo
+echo "Creating virtual environment under: $VENVDIR"
+
+if [[ -d $VENVDIR ]]; then
+	echo "Detected an older virtual environment, deleting it and creating a new one"
+	rm -rf $VENVDIR
+fi
+
+echo "Installing dependencies"
+echo
+
+python3 -m venv $VENVDIR
+$VENVDIR/bin/pip install -r $MYDIR/requirements.txt
+$VENVDIR/bin/pip install -e $MYDIR/client
+
+echo
+echo "Installation complete"

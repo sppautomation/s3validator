@@ -1,4 +1,6 @@
 *.xml
-*.idea
+.idea
 test_env
-__pycache__/
+__pycache__
+*.html
+*.pdf
