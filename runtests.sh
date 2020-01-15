@@ -1,25 +1,21 @@
 #!/bin/bash
 
-cd tests
+MYDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENVDIR=${MYDIR}_venv
 
+cd $MYDIR/tests
 
 if [  $1 == "functional" ]
 then
-../test_env/bin/pytest -v -x -s --junit-xml=test-results.xml  test_offload.py
-
+	$VENVDIR/bin/pytest -v -x -s --junit-xml=test-results.xml  test_offload.py
 fi
 
 if [ $1 == "performance" ]
 then
-../test_env/bin/pytest -v -x -s --serverurl=$2  --username=$3 --password=$4 --junit-xml=test-results.xml  test_performance.py
-
+	$VENVDIR/bin/pytest -v -x -s --serverurl=$2  --username=$3 --password=$4 --junit-xml=test-results.xml  test_performance.py
 fi
 
 if [ $1 == "scale" ]
 then
-../test_env/bin/pytest -v -x -s --serverurl=$2  --username=$3 --password=$4 --junit-xml=test-results.xml test_scale.py
-
+	$VENVDIR/bin/pytest -v -x -s --serverurl=$2  --username=$3 --password=$4 --junit-xml=test-results.xml test_scale.py
 fi
-
-
-

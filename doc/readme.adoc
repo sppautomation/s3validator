@@ -10,7 +10,7 @@ for IBM Spectrum Protect Plus
 // endif::[]
 :doctype: book
 :toc: left
-:toclevels: 3
+:toclevels: 2
 :icons: font
 :pagenums:
 :sectnums:
@@ -29,10 +29,6 @@ This document describes the automated functional and performance tests that you 
 run to validate that a cloud object storage provider is compatible with IBM Spectrum Protect Plus.
 
 Running these tests will verify that IBM Spectrum Protect Plus can successfully offload data to and restore from an S3-compatible storage provider. The tests will also allow you to measure performance and analyze how well the solution scales.
-
-<<<
-
-== Basics
 
 IBM Spectrum Protect Plus (SPP) works by writing data to vSnap servers which serve as the primary backup destination. Data in vSnap servers can then be offloaded/copied to S3-compatible object storage providers using an incremental-forever approach.
 
@@ -173,19 +169,17 @@ Run the following commands as the `serveradmin` user. This will install `git`, i
 ----
 sudo yum --enablerepo=base,updates install git
 sudo yum --enablerepo=base,updates reinstall ca-certificates
-cd ~
 git clone https://github.com/sppautomation/s3validator.git
 ----
 
-The repository is downloaded to the directory `s3validator` under your home directory.
+The repository is downloaded to the `s3validator` directory under your current working directory.
 
 NOTE: If a previous version of the directory `s3validator` already exists, remove it first using `rm -rf s3validator` before using the `git clone` command above.
 
 Then, invoke the installation script:
 
 ----
-cd ~/s3validator
-./install.sh
+./s3validator/install.sh
 ----
 
 Sample output:
@@ -199,7 +193,7 @@ Installing dependencies
 Installation complete
 ----
 
-The installation script creates a Python virtual environment in `s3validator_venv` under your home directory, then downloads and installs some dependencies in the virtual environment. If an existing `s3validator_env` directory is found, the installer removes it and creates a new one.
+The installation script creates a Python virtual environment in a new directory named `s3validator_venv` under the same parent directory as the original `s3validator`. If an existing `s3validator_env` directory is found, the installer removes it and creates a new one. The installer then downloads and installs some dependencies in the virtual environment.
 
 Once the installation is complete, you are ready to configure and run the validation tests.
 
@@ -240,7 +234,7 @@ Before running the test suite, you must configure it to provide details regardin
 To configure the endpoint details, modify the following file and edit the values:
 
 ----
-/home/serveradmin/s3validator/tests/config/cloud_endpoint.json
+s3validator/tests/config/cloud_endpoint.json
 ----
 
 Sample contents:

@@ -3,7 +3,7 @@
 set -e
 
 MYDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VENVDIR=$HOME/s3validator_venv
+VENVDIR=${MYDIR}_venv
 
 echo
 echo "Creating virtual environment under: $VENVDIR"
