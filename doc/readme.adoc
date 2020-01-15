@@ -179,7 +179,7 @@ NOTE: If a previous version of the directory `s3validator` already exists, remov
 Then, invoke the installation script:
 
 ----
-./s3validator/install.sh
+s3validator/install.sh
 ----
 
 Sample output:
@@ -227,7 +227,33 @@ This test evaluates the performance and scalability of the offload feature by dr
 
 The test performs multiple uploads sessions to the S3 endpoint concurrently and measures the average write throughput. The test can be repeated with different concurrency settings to evaluate how the performance scales as the number of sessions increases.
 
+=== Create an API user
+
+NOTE: This step is required.
+
+Before running the test suite, you must create a new vSnap API user. The test suite will use these credentials to communicate with the vSnap APIs in order to drive the offload tests.
+
+As the `serveradmin` user, run the command `vsnap user create`. Specify a new username and password when prompted.
+
+Sample output:
+
+----
+[serveradmin@sid-vsnap-primary ~]$ vsnap user create
+Username: testuser
+Password:
+Repeat for confirmation:
+
+UID: 1003
+GID: 1003
+NAME: testuser
+ROLE: vsnap_admin
+----
+
+Make a note of the credentials. They will be needed later when invoking the test suite.
+
 === Configure the cloud endpoint
+
+NOTE: This step is required.
 
 Before running the test suite, you must configure it to provide details regarding the S3 endpoint you want to test against.
 
@@ -270,65 +296,63 @@ Fields in `cloud_endpoint.json`:
 
 === Configure the test parameters
 
+NOTE: This step is optional.
 
+Before running the test suite, you may want to modify some configuration parameters that dictate the data sizes and concurreny settings used for the functional, performance, and scale tests. The default values are sufficient for most purposes, but if needed, they can be modified by editing the file:
 
-Before running the test suite,
+----
+s3validator/tests/pytest.ini
+----
 
+*Functional test parameters*
 
+Modify the values under the `[offload_test]` section of `pytest.ini`.
 
+[cols="30%a,70%a", options="header"]
+|====
+|Field|Description
+|`incr_count`|Specify the number of incremental offloads that the test will perform after the initial base offload.
+|`base_file_size_MB`|Specify the size (in MB) of the sample data set that will be generated for the initial base offload.
+|`incr_file_size_MB`|Specify the size (in MB) of the same data set that will generated for each incremental offload.
+|====
 
+*Performance test parameters*
 
+Modify the values under the `[performance_test]` section of `pytest.ini`.
 
+[cols="30%a,70%a", options="header"]
+|====
+|Field|Description
+|`base_file_size_MB`|Specify the size (in MB) of the sample data set that will be generated for the base offload used to evaluate upload throughput.
+|====
 
+*Scale test parameters*
 
-<<<
-== Configuration
+Modify the values under the `[scale_test]` section of `pytest.ini`.
 
-The test scripts are divided into three categories as follows:
+[cols="30%a,70%a", options="header"]
+|====
+|Field|Description
+|`base_file_size_MB`|Specify the size (in MB) of the sample data set that will be generated for *each* base offload as part of the scale test.
+|`num_of_offloads`|Specify the total number of offloads that will be triggered as part of the scale test.
+|`max_vsnap_streams`|Specify the maximum number of offloads that will be processed in parallel.
 
-. Functional - These tests will run offload and restore using the registered s3 provider
-. Performance - This test will tell us the throughput for a base offload and restore
-. Scale - This test allows us to measure performance of the vSnap by varying the number of offloads it handles concurrently
+For example, if `max_vsnap_streams` is set to `5`, this means that the vSnap server will maintain a pool of at most 5 workers that are available to perform offloads. If `num_of_offloads` is set to `10` this means that the scale test will create 10 data sets (each of size `base_file_size_MB`) and then attempt to offload all of them. The first 5 will begin immediately as there are 5 workers available, while the remaining 5 offloads will wait in a queue. As each worker in the pool finishes its task, it will pick up the next pending offload in the queue, until there are none left. At the end, the test suite evaluates the average throughput of each offload.
 
-=== Configuring S3 Provider
+You may want to attempt multiple test runs with different versions of `max_vsnap_streams` to evaluate how the average performance scales as the number of workers increases or decreases.
 
-* To run tests, you need to first provide the details of the S3
-provider. To do this, edit the following file:
+Note that increasing the number of workers causes CPU, memory, and network usage to increase as well. The default value of `5` is what most vSnap servers in production run with.
+|====
 
-    tests/config/cloud_endpoint.json
+=== Run the test suite
 
-and provide the following information:
+To run the
 
-* endpoint ->  URL of the S3 provider.
-* api_key -> Access key to be used to login.
-* api_secret -> Password for the key provided above.
-* bucket -> Bucket name.
-* provider ->  You can use the default value.
-
-=== Test Configuration
-
-In directory tests update the pytest.ini file to set the offload size in MB's. Following are the fields you can configure, the default values are
-mentioned for reference.
-
-* Total time out (10800 seconds)
-
-* Functional
-** Base offload (10 MB)
-** Incremental offload (5 MB)
-** Number of increments (3)
-
-
-* Performance
-** Base offload size (1000 MB)
-
-* Scale
-** Base offload Size (10 MB)
-** Number of offloads (10)
-** Max vsnap streams (3)
 
 
 <<<
-== Test execution
+
+== Old content
 
 Run the tests form the s3validator directory:
 

@@ -17,7 +17,7 @@ echo "Installing dependencies"
 echo
 
 python3 -m venv $VENVDIR
-$VENVDIR/bin/pip install -r requirements.txt
+$VENVDIR/bin/pip install -r $MYDIR/requirements.txt
 $VENVDIR/bin/pip install -e $MYDIR/client
 
 echo
