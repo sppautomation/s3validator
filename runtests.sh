@@ -8,29 +8,48 @@ if [[ -d $LOGDIR ]]; then
 	rm -rf $LOGDIR
 fi
 
+mkdir -p ${LOGDIR}
+
 function logMsg {
 	echo "$1" | tee -a ${LOGDIR}/stdout.log
+}
+
+function prepEnv {
+	logMsg "$(date)"
+	logMsg "Configuring vSnap environment for tests" 
+	vsnap system pref set --name volumeDeleteSync --value true | tee -a ${LOGDIR}/stdout.log
+	vsnap system pref set --name snapshotDeleteSync --value true | tee -a ${LOGDIR}/stdout.log
+	vsnap system pref set --name cloudTrimMonitorNumAttempts --value 3 | tee -a ${LOGDIR}/stdout.log
+}
+
+function clearEnv {
+	logMsg "$(date)"
+	logMsg "Resetting vSnap environment"
+	vsnap system pref clear --name volumeDeleteSync | tee -a ${LOGDIR}/stdout.log
+	vsnap system pref clear --name snapshotDeleteSync | tee -a ${LOGDIR}/stdout.log
+	vsnap system pref clear --name cloudTrimMonitorNumAttempts | tee -a ${LOGDIR}/stdout.log
 }
 
 logMsg
 logMsg "Starting test run"
 logMsg "Logs will be written under: $LOGDIR"
 
-logMsg
-logMsg "Configuring vSnap environment for tests"
-vsnap system pref set --name volumeDeleteSync --value true
-vsnap system pref set --name snapshotDeleteSync --value true
-vsnap system pref set --name cloudTrimMonitorNumAttempts --value 3
-
 cd $MYDIR/tests
 
-if [  $1 == "functional" ]; then
+if [[ $1 == "functional" ]]; then
+	prepEnv
 	$VENVDIR/bin/pytest -v -x -s --junit-xml=${LOGDIR}/test-results.xml test_offload.py | tee -a ${LOGDIR}/stdout.log
-elif [ $1 == "performance" ]; then
+	clearEnv
+elif [[ $1 == "performance" ]]; then
+	prepEnv
 	$VENVDIR/bin/pytest -v -x -s --junit-xml=${LOGDIR}/test-results.xml test_performance.py | tee -a ${LOGDIR}/stdout.log
-elif [ $1 == "scale" ]; then
+	clearEnv
+elif [[ $1 == "scale" ]]; then
+	prepEnv
 	$VENVDIR/bin/pytest -v -x -s --junit-xml=${LOGDIR}/test-results.xml test_scale.py | tee -a ${LOGDIR}/stdout.log
+	clearEnv
 else
 	logMsg
-	logMsg "Invalid test type specified: $1"
+	logMsg "ERROR: Invalid test type specified: $1"
 fi
+
