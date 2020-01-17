@@ -2,13 +2,18 @@
 import logging
 import os
 import time
+import configparser
 
 import pytest
 import requests
-
-from _pytest.runner import  runtestprotocol
-
 from clientcore import client
+
+config = configparser.ConfigParser()
+config.read("pytest.ini")
+serverurl = config.get('pytest', 'serverurl')
+username = config.get('pytest', 'username')
+password = config.get('pytest', 'password')
+
 
 def init_logging():
     logger = logging.getLogger()
@@ -17,18 +22,18 @@ def init_logging():
     ch.setFormatter(logging.Formatter(''))
     logger.addHandler(ch)
 
-def pytest_addoption(parser):
-    parser.addoption("--serverurl", action="store", default="https://localhost:8900",
-                     help="vSnap server url")
-    parser.addoption("--username", action="store", default="vsnap",
-                     help="vSnap username")
-    parser.addoption("--password", action="store", default="YKojGy3mBmRh",
-                     help="vSnap password")
+# def pytest_addoption(parser):
+#     parser.addoption("--serverurl", action="store", default="https://localhost:8900",
+#                      help="vSnap server url")
+#     parser.addoption("--username", action="store", default=username,
+#                      help="vSnap username")
+#     parser.addoption("--password", action="store", default=password,
+#                      help="vSnap password")
 
 def pytest_configure(config):
-    os.environ["serverurl"] = config.getoption('serverurl')
-    os.environ["username"] = config.getoption('username')
-    os.environ["password"] = config.getoption('password')
+    os.environ["serverurl"] = serverurl
+    os.environ["username"] = username
+    os.environ["password"] = password
 
 def raise_response_error(r, *args, **kwargs):
     r.raise_for_status()
@@ -81,9 +86,6 @@ def global_config(pytestconfig):
     username = os.getenv('username')
     password = os.getenv('password')
     session = client.VsnapSession(os.getenv('serverurl'), os.getenv('username'), os.getenv('password'))
-    print("Serverurl:{}".format(os.getenv('serverurl')))
-    print("Username:{}".format(os.getenv('username')))
-    print("Password:{}".format(os.getenv('password')))
     vsnap_init(session)
     resp = client.VsnapAPI(session, 'pool').get()
     pool_id = resp['pools'][0]['id']

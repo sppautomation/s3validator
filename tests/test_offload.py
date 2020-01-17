@@ -322,14 +322,14 @@ def test_incr_offload(path, global_config, setup):
     restore(offload_session, resources, global_config, filename, "vol_incr_offload_{}".format(path + 2))
 
 
-def test_cancel_base_offload(global_config, setup):
+def _test_cancel_base_offload(global_config, setup):
     session = global_config.session
     resources = setup
     cancel_offload(session, resources)
 
 
 @pytest.mark.dependency(depends=['test_base_offload'])
-def test_cancel_incr_offload(global_config, setup):
+def _test_cancel_incr_offload(global_config, setup):
     session = global_config.session
     resources = setup
     cancel_offload(session, resources)
