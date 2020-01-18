@@ -1,8 +1,8 @@
 #!/bin/bash
 
 MYDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VENVDIR=${MYDIR}_venv
-LOGDIR=${MYDIR}_logs_$(date "+%Y-%m-%dT%H-%M-%S")
+VENVDIR="$(dirname "${MYDIR}")/s3validator_venv"
+LOGDIR="$(dirname "${MYDIR}")/s3validator_logs_$(date "+%Y-%m-%dT%H-%M-%S")"
 
 if [[ -d $LOGDIR ]]; then
 	rm -rf $LOGDIR
