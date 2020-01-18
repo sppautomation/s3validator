@@ -69,7 +69,10 @@ NOTE: The `serveradmin` user has `sudo` privileges.
 
 If you did not previously configure the network properties, you can do so by running `sudo nmtui` while logged in as the `serveradmin` user.
 
-NOTE: Using a 10 Gbit network adapter is recommended.
+Notes on network configuration:
+
+* Using a 10 Gbit network adapter is recommended.
+* Internet access is required in order to download updates and dependencies for the test suite.
 
 === Configure storage
 

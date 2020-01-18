@@ -17,17 +17,17 @@ function logMsg {
 function prepEnv {
 	logMsg "$(date)"
 	logMsg "Configuring vSnap environment for tests" 
-	vsnap system pref set --name volumeDeleteSync --value true | tee -a ${LOGDIR}/stdout.log
-	vsnap system pref set --name snapshotDeleteSync --value true | tee -a ${LOGDIR}/stdout.log
-	vsnap system pref set --name cloudTrimMonitorNumAttempts --value 3 | tee -a ${LOGDIR}/stdout.log
+	vsnap system pref set --name volumeDeleteSync --value true >>${LOGDIR}/stdout.log
+	vsnap system pref set --name snapshotDeleteSync --value true >>${LOGDIR}/stdout.log
+	vsnap system pref set --name cloudTrimMonitorNumAttempts --value 3 >>${LOGDIR}/stdout.log
 }
 
 function clearEnv {
 	logMsg "$(date)"
 	logMsg "Resetting vSnap environment"
-	vsnap system pref clear --name volumeDeleteSync | tee -a ${LOGDIR}/stdout.log
-	vsnap system pref clear --name snapshotDeleteSync | tee -a ${LOGDIR}/stdout.log
-	vsnap system pref clear --name cloudTrimMonitorNumAttempts | tee -a ${LOGDIR}/stdout.log
+	vsnap system pref clear --name volumeDeleteSync >>${LOGDIR}/stdout.log
+	vsnap system pref clear --name snapshotDeleteSync >>${LOGDIR}/stdout.log
+	vsnap system pref clear --name cloudTrimMonitorNumAttempts >>${LOGDIR}/stdout.log
 }
 
 logMsg
