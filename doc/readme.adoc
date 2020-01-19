@@ -11,8 +11,6 @@ for IBM Spectrum Protect Plus
 
 NOTE: Copyright 2019 IBM Corp. All rights reserved. The contents of this document and any attachments are strictly confidential and are supplied on the understanding that they will be held confidentially and not disclosed to third parties without the prior written consent of IBM.
 
-WARNING: Draft document. This is a work-in-progress.
-
 <<<
 
 == Introduction
