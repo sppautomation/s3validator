@@ -1,13 +1,5 @@
 = S3 Object Storage Provider Validation
 for IBM Spectrum Protect Plus
-// For displaying images in GitHub, we need to specify the absolute URL
-// for the images directory. For everything else, we specify a relative path.
-// ifdef::env-github[]
-// :imagesdir: https://raw.githubusercontent.com/SidBB/s3validator/sidbb_doc/doc/images
-// endif::[]
-// ifndef::env-github[]
-// :imagesdir: ./images
-// endif::[]
 :doctype: book
 :toc: left
 :toclevels: 2
@@ -373,5 +365,6 @@ s3validator/runtests.sh <test_type>
 
 NOTE: Depending on the type of the test and the data sizes involved, the command above may take a long time to complete, ranging from several minutes to several hours. If a test doesn't complete within a certain timeout period, the test is aborted. The default timeout is `86400` seconds (24 hours) but it can be modified in `pytest.ini`.
 
-*TODO*: Update this section to add details about how test results are logged. At present most info is logged to stdout and a few additional details are logged in files created under the `s3validator` directory which are overwritten with every test run. We need to enhance this such that: (1) the stdout is also logged to a file, and (2) each test run creates its output files in some unique directory e.g. named `results_<timestamp>`.
+Each time the test suite is invoked, its output is captured in a directory named `s3validator_logs_<timestamp>` under the same parent directory where the `s3validator` archive was extracted.
 
+For assistance with troubleshooting of test failures, collect a vSnap support bundle using the command `vsnap system logcollect` and provide it to IBM along with the `s3validator_logs_<timestamp>` directory associated with the test run.
