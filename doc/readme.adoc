@@ -1,13 +1,5 @@
 = S3 Object Storage Provider Validation
 for IBM Spectrum Protect Plus
-// For displaying images in GitHub, we need to specify the absolute URL
-// for the images directory. For everything else, we specify a relative path.
-// ifdef::env-github[]
-// :imagesdir: https://raw.githubusercontent.com/SidBB/s3validator/sidbb_doc/doc/images
-// endif::[]
-// ifndef::env-github[]
-// :imagesdir: ./images
-// endif::[]
 :doctype: book
 :toc: left
 :toclevels: 2
@@ -69,7 +61,10 @@ NOTE: The `serveradmin` user has `sudo` privileges.
 
 If you did not previously configure the network properties, you can do so by running `sudo nmtui` while logged in as the `serveradmin` user.
 
-NOTE: Using a 10 Gbit network adapter is recommended.
+Notes on network configuration:
+
+* Using a 10 Gbit network adapter is recommended.
+* Internet access is required in order to download updates and dependencies for the test suite.
 
 === Configure storage
 
@@ -82,7 +77,7 @@ For the purpose of running the validation tests you must configure two storage a
 
 The primary storage pool is the data repository where backup data is written. On a freshly installation of vSnap, no storage pool exists. As part of the vSnap initialization process, the pool is created using one or more SCSI disks.
 
-By default, the vSnap virtual appliance includes an unused 100 GB SCSI disk which can be used to create the storage pool. If you plan to run basic tests to verify functionality and/or measure performance using a data set that is smaller than *100 GB*, it is sufficient to use the default disk to create the storage pool. If you plan to test with larger data sets, you may want to attach additional disks to create a larger storage pool.
+By default, the vSnap virtual appliance includes an unused 100 GB SCSI disk which can be used to create the storage pool.
 
 Run `vsnap disk show` to list disks and confirm that one or more unused SCSI disks are available. The sample output below shows one unused 100 GB disk (`/dev/sdb`):
 
@@ -95,9 +90,13 @@ UUID                             | TYPE | VENDOR | MODEL        | SIZE     | USE
 6000c294c22b7968054789932dcf6621 | SCSI | VMware | Virtual disk | 128.00GB | LVM2_member | sdc   | /dev/sdc
 ----
 
-To use a storage pool larger than 100 GB, attach one or more additional disks to the system, run `vsnap disk rescan` and then rerun `vsnap disk show` to confirm that they are all recognized as being unused.
+For the purposes of running the validation tests, a larger pool is required, particularly if you plan to run performance tests or scale tests which, by default, are configured to work with data sets larger than 100 GB.
 
-To initialize the vSnap system, run `vsnap system init`. As part of the initialization process, vSnap creates a storage pool using all available unused disks
+To use a larger storage pool, attach one or more additional disks to the system. It is recommended that you add one or more disks totaling at least 500 GB.
+
+Run `vsnap disk rescan` and then rerun `vsnap disk show` to confirm that the newly added disks are all recognized as being unused.
+
+To initialize the vSnap system, run `vsnap system init`. As part of the initialization process, vSnap creates a storage pool using all available unused disks.
 
 Afterwards, run `vsnap pool show` to confirm that a storage pool has been created.
 
@@ -134,7 +133,7 @@ DISKS IN POOL:
 
 *Cache area*
 
-By default, the vSnap virtual appliance includes a 128 GB XFS filesystem mounted at `/opt/vsnap-data` which is used as the cache area. If you plan to run basic tests to verify functionality and/or measure performance using a storage pool that is smaller than *10 TB*, it is sufficient to use the default 128 GB cache area.
+By default, the vSnap virtual appliance includes a 128 GB XFS filesystem mounted at `/opt/vsnap-data` which is used as the cache area. If you plan to run basic tests to verify functionality and/or measure performance using a storage pool that is smaller than 10 TB, it is sufficient to use the default 128 GB cache area.
 
 If you plan to test with larger data sets, you may want to attach one or more additional disks and expand the `/opt/vsnap-data` filesystem.
 
@@ -162,25 +161,31 @@ Finally, run `df -h` and verify that the volume `/opt/vsnap-data` is mounted and
 
 === Download and install the test suite
 
-*TODO*: Update this section before release to recommend using `wget <url>` pointing to a stable release instead of `git clone <url>`.
-
-Run the following commands as the `serveradmin` user. This will install `git`, install the most up-to-date SSL certificates, and then clone the Git repository containing the test suite.
+Before you begin, run the following command as the `serveradmin` user. This will install the most up-to-date SSL certificates.
 
 ----
-sudo yum --enablerepo=base,updates install git
 sudo yum --enablerepo=base,updates reinstall ca-certificates
-git clone https://github.com/sppautomation/s3validator.git
 ----
 
-The repository is downloaded to the `s3validator` directory under your current working directory.
+The test suite is distributed as a `tar.gz` archive.
 
-NOTE: If a previous version of the directory `s3validator` already exists, remove it first using `rm -rf s3validator` before using the `git clone` command above.
+Running as the `serveradmin` user, download the archive to the vSnap server, copy it to a suitable directory (e.g. `/home/serveradmin/`) and extract it using command:
 
-Then, invoke the installation script:
+----
+tar -xzvf <filename>
+----
+
+The contents of the archive are extracted to a directory named `s3validator-<version>`.
+
+NOTE: The sample commands in the rest of this document assume that the name of the extracted directory is simply `s3validator`. For convenience, you can rename the directory: `mv s3validator-<version>/ s3validator/`.
+
+Invoke the installation script using the command:
 
 ----
 s3validator/install.sh
 ----
+
+It creates a Python virtual environment in a new directory named `s3validator_venv` under the same parent directory where the archive was extracted. If an existing `s3validator_env` directory is found, the installer removes it and creates a new one. The installer then downloads and installs some dependencies in the virtual environment.
 
 Sample output:
 
@@ -192,8 +197,6 @@ Installing dependencies
 
 Installation complete
 ----
-
-The installation script creates a Python virtual environment in a new directory named `s3validator_venv` under the same parent directory as the original `s3validator`. If an existing `s3validator_env` directory is found, the installer removes it and creates a new one. The installer then downloads and installs some dependencies in the virtual environment.
 
 Once the installation is complete, you are ready to configure and run the validation tests.
 
@@ -227,18 +230,18 @@ This test evaluates the performance and scalability of the offload feature by dr
 
 The test performs multiple uploads sessions to the S3 endpoint concurrently and measures the average write throughput. The test can be repeated with different concurrency settings to evaluate how the performance scales as the number of sessions increases.
 
-=== Create an API user
+=== Configure vSnap API credentials
 
 NOTE: This step is required.
 
-Before running the test suite, you must create a new vSnap API user. The test suite will use these credentials to communicate with the vSnap APIs in order to drive the offload tests.
+Before running the test suite, you must create a new vSnap API user and configure the test suite to use its credentials. The test suite will use these credentials to communicate with the vSnap APIs in order to drive the offload tests.
 
 As the `serveradmin` user, run the command `vsnap user create`. Specify a new username and password when prompted.
 
 Sample output:
 
 ----
-[serveradmin@sid-vsnap-primary ~]$ vsnap user create
+[serveradmin@vsnap ~]$ vsnap user create
 Username: testuser
 Password:
 Repeat for confirmation:
@@ -249,7 +252,13 @@ NAME: testuser
 ROLE: vsnap_admin
 ----
 
-Make a note of the credentials. They will be needed later when invoking the test suite.
+Modify the following file:
+
+----
+s3validator/tests/pytest.ini
+----
+
+Under the `[pytest]` section of the configuration file, update the `username` and `password` values to specify the credentials of the newly created user.
 
 === Configure the cloud endpoint
 
@@ -286,11 +295,11 @@ Fields in `cloud_endpoint.json`:
 |`bucket`|Specify the name of the bucket that will be used for the tests.
 |`provider`|Specify the provider type of the endpoint. Valid values:
 
+* `generic`: Any S3-compatible endpoint that does not match one of the specific types listed below. This is the recommended value for most validation tests unless you are specifically testing one of the other types listed below.
 * `cos`: IBM Cloud Object Storage
 * `sp`: IBM Spectrum Protect
 * `aws`: Amazon S3
 * `azure`: Microsoft Azure Blob Storage
-* `generic`: Any other S3-compatible endpoint
 
 |====
 
@@ -349,16 +358,13 @@ Note that increasing the number of workers causes CPU, memory, and network usage
 To invoke the test suite, run:
 
 ----
-s3validator/runtests.sh <test_type> https://localhost:8900 <username> <password>
+s3validator/runtests.sh <test_type>
 ----
 
 `<test_type>`: Specify `functional`, `performance`, or `scale`.
 
-`<username>`: Specify the username of the API user created earlier.
-
-`<password>`: Specify the password of the API user created earlier.
-
 NOTE: Depending on the type of the test and the data sizes involved, the command above may take a long time to complete, ranging from several minutes to several hours. If a test doesn't complete within a certain timeout period, the test is aborted. The default timeout is `86400` seconds (24 hours) but it can be modified in `pytest.ini`.
 
-*TODO*: Update this section to add details about how test results are logged. At present most info is logged to stdout and a few additional details are logged in files created under the `s3validator` directory which are overwritten with every test run. We need to enhance this such that: (1) the stdout is also logged to a file, and (2) each test run creates its output files in some unique directory e.g. named `results_<timestamp>`.
+Each time the test suite is invoked, its output is captured in a directory named `s3validator_logs_<timestamp>` under the same parent directory where the `s3validator` archive was extracted.
 
+For assistance with troubleshooting of test failures, collect a vSnap support bundle using the command `vsnap system logcollect` and provide it to IBM along with the `s3validator_logs_<timestamp>` directory associated with the test run.
