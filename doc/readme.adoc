@@ -173,7 +173,7 @@ Once the installation is complete, you are ready to configure and run the valida
 
 === Overview
 
-The test suite consists of the following categories of tests. The next few sections of this document describe the detailed configuration for driving these tests.
+The test suite consists of the following categories of tests.
 
 *Functional test*
 
@@ -241,7 +241,7 @@ s3validator-<version>/runtests.sh functional
 * To invoke the performance tests, run:
 
 ----
-s3validator-<version>/runtests.sh functional
+s3validator-<version>/runtests.sh performance
 ----
 
 * To invoke the scale tests, run:
