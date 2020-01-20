@@ -43,16 +43,16 @@ The key steps required for configuring the vSnap server for the purpose of the v
 === Deploy the vSnap virtual appliance
 
 * Deploy the vSnap OVA in a VMware environment using the `Deploy OVF Template` option.
-* Enter network properties for the virtual machine as part of the deployment wizard, or leave them blank to use DHCP. You can also configure the network properties at a later time once the virtual machine is up and running.
+* Enter network properties for the virtual machine as part of the deployment wizard or leave them blank to use DHCP. You can also configure the network properties at a later time once the virtual machine is up and running.
 * Once deployment completes, before powering on the virtual machine, edit its settings to adjust the virtual hardware. The following values are recommended for a system intended for the validation tests:
 ** Number of vCPUs: 8
 ** Total Memory: 40 GB
 ** Number of network adapters: 1
-*** Note: Using a 10 Gbig network adapter is recommended.
+*** Using a 10 Gbit network adapter is recommended.
 * Power on the virtual machine and login using the default credentials:
 ** Username: `serveradmin`
 ** Password: `sppDP758-SysXyz`
-* Upon initial login, you are prompted to change the default password. Enter the default password first, then enter the new password twice. Upon changing the password you are immediately logged out and must log back in using the new password.
+* Upon initial login, you are prompted to change the default password. Enter the default password first, then enter the new password twice. Upon changing the password, you are immediately logged out and must log back in using the new password.
 
 NOTE: The `serveradmin` user has `sudo` privileges.
 
