@@ -268,7 +268,7 @@ s3validator-<version>/tests/pytest.ini
 
 *Functional test parameters*
 
-Modify the values under the `[offload_test]` section of `pytest.ini`.
+Modify the values under the `[functional_test]` section of `pytest.ini`.
 
 [cols="30%a,70%a", options="header"]
 |====
@@ -296,12 +296,12 @@ Modify the values under the `[scale_test]` section of `pytest.ini`.
 |====
 |Field|Description
 |`base_file_size_MB`|Specify the size (in MB) of the sample data set that will be generated for *each* base copy as part of the scale test.
-|`num_of_offloads`|Specify the total number of copies that will be triggered as part of the scale test.
-|`max_vsnap_streams`|Specify the maximum number of copies that will be processed in parallel.
+|`num_of_sessions`|Specify the total number of copies that will be triggered as part of the scale test.
+|`max_parallel_sessions`|Specify the maximum number of copies that will be processed in parallel.
 
-For example, if `max_vsnap_streams` is set to `5`, this means that the vSnap server will maintain a pool of at most 5 workers that are available to perform copy sessions. If `num_of_offloads` is set to `10` this means that the scale test will create 10 data sets (each of size `base_file_size_MB`) and then attempt to upload all of them. The first 5 will begin immediately as there are 5 workers available, while the remaining 5 sessions will wait in a queue. As each worker in the pool finishes its session, it will pick up the next pending session in the queue, until there are none left. At the end, the test suite evaluates the average throughput of each copy session.
+For example, if `max_parallel_sessions` is set to `5`, this means that the vSnap server will maintain a pool of at most 5 workers that are available to perform copy sessions. If `num_of_sessions` is set to `10` this means that the scale test will create 10 data sets (each of size `base_file_size_MB`) and then attempt to upload all of them. The first 5 will begin immediately as there are 5 workers available, while the remaining 5 sessions will wait in a queue. As each worker in the pool finishes its session, it will pick up the next pending session in the queue, until there are none left. At the end, the test suite evaluates the average throughput of each copy session.
 
-You can perform multiple test runs with different versions of `max_vsnap_streams` to evaluate how the average performance scales as the number of workers increases or decreases.
+You can perform multiple test runs with different versions of `max_parallel_sessions` to evaluate how the average performance scales as the number of workers increases or decreases.
 
 Note that increasing the number of workers causes CPU, memory, and network usage to increase as well. The default value of `5` is what most vSnap servers in production run with.
 |====

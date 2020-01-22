@@ -15,9 +15,9 @@ from common import system, util, consts
 
 config = configparser.ConfigParser()
 config.read("pytest.ini")
-count_of_offloads = int(config.get('scale_test', 'num_of_offloads'))
+count_of_offloads = int(config.get('scale_test', 'num_of_sessions'))
 base_file_size_MB = int(config.get('scale_test', 'base_file_size_MB'))
-max_vsnap_streams = int(config.get('scale_test', 'max_vsnap_streams'))
+max_vsnap_streams = int(config.get('scale_test', 'max_parallel_sessions'))
 
 analysis_offload = PrettyTable()
 analysis_offload.field_names = ["Offload count", "Max streams", "Total Time ", "Total offload size", "Average offload time (sec)", "Average throughput((MB/s))" ]
