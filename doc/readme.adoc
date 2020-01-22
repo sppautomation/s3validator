@@ -35,7 +35,7 @@ The validation tests are distributed as a `tar.gz` archive consisting of a Pytho
 
 Set up a vSnap server by deploying the virtual appliance in a VMware vSphere environment.
 
-Detailed instructions for installing, configuring, and managing a vSnap server can be found in https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_install_vsnap.html[IBM Knowledge Center].
+Detailed instructions for installing, configuring, and managing a vSnap server can be found in https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_install_vsnap_vmware.html[IBM Knowledge Center].
 
 The key steps required for configuring the vSnap server for the purpose of the validation tests are summarized below.
 
