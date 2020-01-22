@@ -131,7 +131,7 @@ def monitor_sync_session(clientsess, sync_id):
                 size = util.get_offload_size(offload_session['size_sent'])
 
                 print("\n")
-                title_txt("OFFLOAD:")
+                title_txt("UPLOAD:")
 
                 time_taken = int(offload_session['time_ended']) - int(offload_session['time_started'])
                 t = str(datetime.timedelta(seconds=time_taken))
