@@ -15,9 +15,9 @@ from common import system, util, consts
 
 config = configparser.ConfigParser()
 config.read("pytest.ini")
-incr_count = int(config.get('offload_test', 'incr_count'))
-base_file_size_MB = int(config.get('offload_test', 'base_file_size_MB'))
-incr_file_size_MB = int(config.get('offload_test', 'incr_file_size_MB'))
+incr_count = int(config.get('functional_test', 'incr_count'))
+base_file_size_MB = int(config.get('functional_test', 'base_file_size_MB'))
+incr_file_size_MB = int(config.get('functional_test', 'incr_file_size_MB'))
 
 
 @pytest.fixture(scope="module")

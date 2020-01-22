@@ -15,69 +15,68 @@ NOTE: Copyright 2019 IBM Corp. All rights reserved. The contents of this documen
 
 == Introduction
 
-This document describes the automated functional and performance tests that you can
-run to validate that a cloud object storage provider is compatible with IBM Spectrum Protect Plus.
+This document describes the automated functional and performance tests that enable you to validate that a cloud object storage provider is compatible with IBM Spectrum Protect Plus.
 
-Running these tests will verify that IBM Spectrum Protect Plus can successfully offload data to and restore from an S3-compatible storage provider. The tests will also allow you to measure performance and analyze how well the solution scales.
+Running these tests will verify that IBM Spectrum Protect Plus can successfully copy data to and restore from an S3-compatible object storage provider. The tests will also enable you to measure performance and analyze how well the solution scales.
 
-IBM Spectrum Protect Plus (SPP) works by writing data to vSnap servers which serve as the primary backup destination. Data in vSnap servers can then be offloaded/copied to S3-compatible object storage providers using an incremental-forever approach.
+IBM Spectrum Protect Plus (SPP) works by writing data to disk-based storage called vSnap servers which serve as the primary backup destination. Data in vSnap servers can then be copied to S3-compatible object storage providers using an incremental-forever approach.
 
-A typical deployment usually consists of one SPP server which acts as the control plane, plus one or more vSnap servers which store data.
+A typical deployment consists of one SPP server which acts as the control plane, and one or more vSnap servers which store data.
 
 SPP is distributed as a pre-built virtual appliance that can be deployed in VMware or Hyper-V environments. vSnap can be similarly deployed as a pre-built virtual appliance, or it can be installed on a custom physical or virtual Linux system that meets certain pre-requisites.
 
-In order to run the validation tests, you do not need to set up an SPP server, but you must at least install and configure a vSnap server, as described in the `Prerequisites` section.
+In order to run the validation tests, an SPP server is not required, but you must at least install and configure a vSnap server, as described in the `Prerequisites` section.
 
-The validation tests are distributed as a `tar.gz` archive consisting of a Python-based test suite and associated configuration files. The tests are designed to run locally on a vSnap server. They work by generating a random set of data, writing it to the vSnap server's disk-based storage pool, and then offloading/copying the data to the object storage. The tests also restore data by downloading it from object storage and verifying that its contents are valid.
+The validation tests are distributed as a `tar.gz` archive consisting of a Python-based test suite and associated configuration files. The tests are designed to run locally on a vSnap server. They work by generating a random set of data, writing it to the vSnap server's disk-based storage pool, and then copying the data to the object storage. The tests also restore data by downloading it from object storage and verifying that its contents are valid.
 
 <<<
 
 == Prerequisites
 
-Set up a vSnap server by deploying a virtual appliance or running the installer on a custom Linux system. For simplicity and ease of deployment, using the virtual appliance is highly recommended.
+Set up a vSnap server by deploying the virtual appliance in a VMware vSphere environment.
 
-Detailed instructions for installing, configuring, and managing a vSnap server can be found https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_install_vsnap.html[here].
+Detailed instructions for installing, configuring, and managing a vSnap server can be found in https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_install_vsnap_vmware.html[IBM Knowledge Center].
 
 The key steps required for configuring the vSnap server for the purpose of the validation tests are summarized below.
 
 === Deploy the vSnap virtual appliance
 
-* Deploy the vSnap OVA in a VMware environment using the `Deploy OVF Template` option.
-* Enter network properties for the virtual machine as part of the deployment wizard, or leave them blank to use DHCP. You can also configure the network properties at a later time once the virtual machine is up and running.
-* Once deployment completes, before powering on the virtual machine, edit its settings to adjust the virtual hardware. The following values are recommended for a system intended for the validation tests:
+* Deploy the vSnap OVA in a VMware vSphere environment using the `Deploy OVF Template` option.
+* Enter network properties for the virtual machine as part of the deployment wizard or leave them blank to use DHCP. You can also configure the network properties at a later time once the virtual machine is up and running.
+* Once deployment completes, before powering on the virtual machine, edit its settings to adjust the virtual hardware. For a system intended for the validation tests, specify the following configuration:
 ** Number of vCPUs: 8
 ** Total Memory: 40 GB
 ** Number of network adapters: 1
+*** Using a 10 Gbit network adapter is recommended.
 * Power on the virtual machine and login using the default credentials:
 ** Username: `serveradmin`
 ** Password: `sppDP758-SysXyz`
-* Upon initial login, you are prompted to change the default password. Enter the default password first, then enter the new password twice. You may be forced to log out and log back in after changing the password.
+* Upon initial login, you are prompted to change the default password. Enter the default password first, then enter the new password twice. Upon changing the password, you are immediately logged out and must log back in using the new password.
 
 NOTE: The `serveradmin` user has `sudo` privileges.
 
 === Configure network settings
 
-If you did not previously configure the network properties, you can do so by running `sudo nmtui` while logged in as the `serveradmin` user.
+If you did not previously configure the network properties during the OVA deployment wizard, you can do so by running `sudo nmtui` while logged in as the `serveradmin` user.
 
-Notes on network configuration:
-
-* Using a 10 Gbit network adapter is recommended.
-* Internet access is required in order to download updates and dependencies for the test suite.
+NOTE: Internet access is required in order to download updates and dependencies for the test suite.
 
 === Configure storage
 
-For the purpose of running the validation tests you must configure two storage areas:
+The validation tests make use of two storage areas on the vSnap server:
 
-* The primary disk-based storage pool where data is initially written.
-* A disk-based cache area where data is temporarily staged while it is being offloaded/copied from the primary storage pool to the object storage.
+* The primary disk-based storage pool where data is initially written. A storage pool of at least 500 GB is required for the validation tests.
+* A disk-based cache area where data is temporarily staged while it is being copied from the primary storage pool to the object storage. A cache area of at least 128 GB is required for the validation tests.
 
 *Primary storage pool*
 
 The primary storage pool is the data repository where backup data is written. On a freshly installation of vSnap, no storage pool exists. As part of the vSnap initialization process, the pool is created using one or more SCSI disks.
 
-By default, the vSnap virtual appliance includes an unused 100 GB SCSI disk which can be used to create the storage pool.
+By default, the vSnap virtual appliance includes an unused 100 GB SCSI disk which can be used to create the storage pool. You must attach additional disks to the virtual machine in order to create a pool that is 500 GB or larger.
 
-Run `vsnap disk show` to list disks and confirm that one or more unused SCSI disks are available. The sample output below shows one unused 100 GB disk (`/dev/sdb`):
+To create the storage pool:
+
+* Run `vsnap disk show` to list disks and confirm that one or more unused SCSI disks are available. By default, the vSnap virtual appliance includes an unused 100 GB SCSI disk (`/dev/sdb`) as seen in the sample output below:
 
 ----
 [serveradmin@vsnap ~]$ vsnap disk show
@@ -88,17 +87,10 @@ UUID                             | TYPE | VENDOR | MODEL        | SIZE     | USE
 6000c294c22b7968054789932dcf6621 | SCSI | VMware | Virtual disk | 128.00GB | LVM2_member | sdc   | /dev/sdc
 ----
 
-For the purposes of running the validation tests, a larger pool is required, particularly if you plan to run performance tests or scale tests which, by default, are configured to work with data sets larger than 100 GB.
-
-To use a larger storage pool, attach one or more additional disks to the system. It is recommended that you add one or more disks totaling at least 500 GB.
-
-Run `vsnap disk rescan` and then rerun `vsnap disk show` to confirm that the newly added disks are all recognized as being unused.
-
-To initialize the vSnap system, run `vsnap system init`. As part of the initialization process, vSnap creates a storage pool using all available unused disks.
-
-Afterwards, run `vsnap pool show` to confirm that a storage pool has been created.
-
-Sample output:
+* Attach one or more additional disks to the system totaling at least 500 GB.
+* Run `vsnap disk rescan` and then rerun `vsnap disk show` to confirm that the newly added disks are all recognized as being unused.
+* Run `vsnap system init` to initialize the vSnap installation. As part of the initialization process, vSnap creates a storage pool using all available unused disks.
+* When initialization completes, run `vsnap pool show` to confirm that a storage pool has been created. Note that a freshly created pool will show a few GB of space as being used. This is reserved for internal pool metadata. The rest of the space is listed as free. Sample output:
 
 ----
 [serveradmin@vsnap ~]$ vsnap pool show
@@ -116,9 +108,9 @@ DEDUPLICATION RATIO: 1.00
 ENCRYPTION:
     ENABLED: No
 
-TOTAL SPACE: 99.99GB
-FREE SPACE: 96.39GB
-USED SPACE: 3.60GB
+TOTAL SPACE: 600.00GB
+FREE SPACE: 590.00GB
+USED SPACE: 10.00GB
 DATA SIZE BEFORE DEDUPLICATION: 134.50KB
 DATA SIZE BEFORE COMPRESSION: 53.50KB
 CREATED: 2020-01-06 20:19:33 UTC
@@ -127,31 +119,12 @@ DISKS PER RAID GROUP: 1
 DISKS IN POOL:
     RAID0:
         /dev/sdb1
+        /dev/sdd1
 ----
 
 *Cache area*
 
-By default, the vSnap virtual appliance includes a 128 GB XFS filesystem mounted at `/opt/vsnap-data` which is used as the cache area. If you plan to run basic tests to verify functionality and/or measure performance using a storage pool that is smaller than 10 TB, it is sufficient to use the default 128 GB cache area.
-
-If you plan to test with larger data sets, you may want to attach one or more additional disks and expand the `/opt/vsnap-data` filesystem.
-
-To expand the cache area, attach one or more disks to the system, run `vsnap disk rescan` and then rerun `vsnap disk show` to confirm that they are all recognized as being unused.
-
-The `/opt/vsnap-data` filesystem sits on an LVM logical volume named `vsnapdatalv` within a volume group named `vsnapdata`.  Use the following commands to create a physical volume, add it to the existing volume group, expand the logical volume, and then extend the XFS filesystem.
-
-The sample commands below assume that a new unused disk named `/dev/sdx` has been added.
-
-----
-sudo pvcreate /dev/sdx
-
-sudo vgextend vsnapdata /dev/sdx
-
-sudo lvextend -l 100%VG /dev/mapper/vsnapdata-vsnapdatalv
-
-sudo xfs_growfs /dev/mapper/vsnapdata-vsnapdatalv
-----
-
-Finally, run `df -h` and verify that the volume `/opt/vsnap-data` is mounted and has the desired new size.
+By default, the vSnap virtual appliance includes a 128 GB XFS filesystem mounted at `/opt/vsnap-data` which is used as the cache area. This is sufficient for the validation tests and no further manual configuration is required.
 
 <<<
 
@@ -159,31 +132,26 @@ Finally, run `df -h` and verify that the volume `/opt/vsnap-data` is mounted and
 
 === Download and install the test suite
 
-Before you begin, run the following command as the `serveradmin` user. This will install the most up-to-date SSL certificates.
+* Login to the vSnap server as the `serveradmin` user.
+* Run the following command to install the most up-to-date SSL certificates.
 
 ----
 sudo yum --enablerepo=base,updates reinstall ca-certificates
 ----
 
-The test suite is distributed as a `tar.gz` archive.
-
-Running as the `serveradmin` user, download the archive to the vSnap server, copy it to a suitable directory (e.g. `/home/serveradmin/`) and extract it using command:
+* The test suite is distributed as a `tar.gz` archive. Download the archive to the vSnap server, copy it to a suitable directory (e.g. `/home/serveradmin/`) and extract it using the command. The contents of the archive are extracted to a directory named `s3validator-<version>`.
 
 ----
 tar -xzvf <filename>
 ----
 
-The contents of the archive are extracted to a directory named `s3validator-<version>`.
-
-NOTE: The sample commands in the rest of this document assume that the name of the extracted directory is simply `s3validator`. For convenience, you can rename the directory: `mv s3validator-<version>/ s3validator/`.
-
-Invoke the installation script using the command:
+* Invoke the installation script using the command:
 
 ----
-s3validator/install.sh
+s3validator-<version>/install.sh
 ----
 
-It creates a Python virtual environment in a new directory named `s3validator_venv` under the same parent directory where the archive was extracted. If an existing `s3validator_env` directory is found, the installer removes it and creates a new one. The installer then downloads and installs some dependencies in the virtual environment.
+The installation script creates a Python virtual environment in a new directory named `s3validator_venv` under the same parent directory where the archive was extracted. If an existing `s3validator_env` directory is found, the installer removes it and creates a new one. The installer then downloads and installs some dependencies in the virtual environment.
 
 Sample output:
 
@@ -204,19 +172,19 @@ Once the installation is complete, you are ready to configure and run the valida
 
 === Overview
 
-The test suite consists of the following categories of tests. The next few sections of this document describe the detailed configuration for driving these tests.
+The test suite consists of the following categories of tests.
 
 *Functional test*
 
-This test evaluates the basic functionality of the offload feature.
+This test evaluates the basic functionality of copying data to object storage.
 
-The test uploads data to the S3 endpoint in multiple iterations starting with a larger base offload followed by a few smaller incremental offloads. The test also verifies downloads by restoring the data from each iteration.
+The test uploads data to the S3 endpoint in multiple iterations starting with a larger base copy followed by a few smaller incremental copies. The test also verifies downloads by restoring the data from each iteration.
 
 Since this test is designed to validate basic functionality, by default it is configured to transfer a relatively small amount of data.
 
 *Performance test*
 
-This test evaluates the performance of the offload feature.
+This test evaluates the performance of the copy to object storage.
 
 The test performs a single upload session to the S3 endpoint and measures the write throughput. It also verifies downloads by restoring the data and measuring the read throughput.
 
@@ -224,25 +192,21 @@ Since the goal of this test is to measure throughput, by default it is configure
 
 *Scale test*
 
-This test evaluates the performance and scalability of the offload feature by driving multiple concurrent offload operations.
+This test evaluates the performance and scalability of the copy to object storage by driving multiple concurrent copy operations.
 
-The test performs multiple uploads sessions to the S3 endpoint concurrently and measures the average write throughput. The test can be repeated with different concurrency settings to evaluate how the performance scales as the number of sessions increases.
+The test performs multiple uploads sessions to the S3 endpoint concurrently and measures the average write throughput.
 
-=== Configure vSnap API credentials
+=== Configure the test suite
 
-NOTE: This step is required.
-
-Before running the test suite, you must create a new vSnap API user and configure the test suite to use its credentials. The test suite will use these credentials to communicate with the vSnap APIs in order to drive the offload tests.
-
-As the `serveradmin` user, run the command `vsnap user create`. Specify a new username and password when prompted.
+* As the `serveradmin` user, run the command `vsnap user create` to create a new vSnap API user. Specify a new username and password when prompted.
 
 Sample output:
 
 ----
 [serveradmin@vsnap ~]$ vsnap user create
 Username: testuser
-Password:
-Repeat for confirmation:
+Password: <not displayed>
+Repeat for confirmation: <not displayed>
 
 UID: 1003
 GID: 1003
@@ -250,37 +214,8 @@ NAME: testuser
 ROLE: vsnap_admin
 ----
 
-Modify the following file:
-
-----
-s3validator/tests/pytest.ini
-----
-
-Under the `[pytest]` section of the configuration file, update the `username` and `password` values to specify the credentials of the newly created user.
-
-=== Configure the cloud endpoint
-
-NOTE: This step is required.
-
-Before running the test suite, you must configure it to provide details regarding the S3 endpoint you want to test against.
-
-To configure the endpoint details, modify the following file and edit the values:
-
-----
-s3validator/tests/config/cloud_endpoint.json
-----
-
-Sample contents:
-
-----
-{
-    "endpoint": "https://s3.example.com",
-    "api_key": "xxxxxxxx",
-    "api_secret": "yyyyyyyy",
-    "bucket": "sample-bucket",
-    "provider": "generic"
-}
-----
+* Modify the file `s3validator-<version>/tests/pytest.ini`. Under the `[pytest]` section of the configuration file, update the `username` and `password` values to specify the credentials of the newly created user.
+* To configure the endpoint details, modify the file `s3validator-<version>/tests/config/cloud_endpoint.json` and set the appropriate values as described below.
 
 Fields in `cloud_endpoint.json`:
 
@@ -291,36 +226,55 @@ Fields in `cloud_endpoint.json`:
 |`api_key`|Specify the Access Key for the endpoint.
 |`api_secret`|Specify the Secret Key for the endpoint.
 |`bucket`|Specify the name of the bucket that will be used for the tests.
-|`provider`|Specify the provider type of the endpoint. Valid values:
-
-* `generic`: Any S3-compatible endpoint that does not match one of the specific types listed below. This is the recommended value for most validation tests unless you are specifically testing one of the other types listed below.
-* `cos`: IBM Cloud Object Storage
-* `sp`: IBM Spectrum Protect
-* `aws`: Amazon S3
-* `azure`: Microsoft Azure Blob Storage
-
+|`provider`|Do not edit this value. It must be set to `generic`.
 |====
 
-=== Configure the test parameters
+=== Run the test suite
 
-NOTE: This step is optional.
-
-Before running the test suite, you may want to modify some configuration parameters that dictate the data sizes and concurreny settings used for the functional, performance, and scale tests. The default values are sufficient for most purposes, but if needed, they can be modified by editing the file:
+* To invoke the functional tests, run:
 
 ----
-s3validator/tests/pytest.ini
+s3validator-<version>/runtests.sh functional
+----
+
+* To invoke the performance tests, run:
+
+----
+s3validator-<version>/runtests.sh performance
+----
+
+* To invoke the scale tests, run:
+
+----
+s3validator-<version>/runtests.sh scale
+----
+
+NOTE: Depending on the type of the test and the data sizes involved, the commands above may take a long time to complete, ranging from several minutes to several hours. If a test doesn't complete within a default timeout period of 24 hours, the test is aborted.
+
+Each time the test suite is invoked, its output is captured in a directory named `s3validator_logs_<timestamp>` under the same parent directory where the `s3validator` archive was extracted.
+
+For assistance with troubleshooting, collect a vSnap support bundle using the command `vsnap system logcollect` and provide it to IBM along with the `s3validator_logs_<timestamp>` directory associated with the test run.
+
+== Appendix
+
+=== Configure optional test parameters
+
+You can optionally modify test configuration parameters that dictate the data sizes and concurrency settings used for the functional, performance, and scale tests. The default values are sufficient for most purposes, but if needed, they can be modified by editing the file:
+
+----
+s3validator-<version>/tests/pytest.ini
 ----
 
 *Functional test parameters*
 
-Modify the values under the `[offload_test]` section of `pytest.ini`.
+Modify the values under the `[functional_test]` section of `pytest.ini`.
 
 [cols="30%a,70%a", options="header"]
 |====
 |Field|Description
-|`incr_count`|Specify the number of incremental offloads that the test will perform after the initial base offload.
-|`base_file_size_MB`|Specify the size (in MB) of the sample data set that will be generated for the initial base offload.
-|`incr_file_size_MB`|Specify the size (in MB) of the same data set that will generated for each incremental offload.
+|`incr_count`|Specify the number of incremental copies that the test will perform after the initial base copy.
+|`base_file_size_MB`|Specify the size (in MB) of the sample data set that will be generated for the initial base copy.
+|`incr_file_size_MB`|Specify the size (in MB) of the same data set that will generated for each incremental copy.
 |====
 
 *Performance test parameters*
@@ -330,7 +284,7 @@ Modify the values under the `[performance_test]` section of `pytest.ini`.
 [cols="30%a,70%a", options="header"]
 |====
 |Field|Description
-|`base_file_size_MB`|Specify the size (in MB) of the sample data set that will be generated for the base offload used to evaluate upload throughput.
+|`base_file_size_MB`|Specify the size (in MB) of the sample data set that will be generated for the base copy used to evaluate upload throughput.
 |====
 
 *Scale test parameters*
@@ -340,29 +294,41 @@ Modify the values under the `[scale_test]` section of `pytest.ini`.
 [cols="30%a,70%a", options="header"]
 |====
 |Field|Description
-|`base_file_size_MB`|Specify the size (in MB) of the sample data set that will be generated for *each* base offload as part of the scale test.
-|`num_of_offloads`|Specify the total number of offloads that will be triggered as part of the scale test.
-|`max_vsnap_streams`|Specify the maximum number of offloads that will be processed in parallel.
+|`base_file_size_MB`|Specify the size (in MB) of the sample data set that will be generated for *each* base copy as part of the scale test.
+|`num_of_sessions`|Specify the total number of copies that will be triggered as part of the scale test.
+|`max_parallel_sessions`|Specify the maximum number of copies that will be processed in parallel.
 
-For example, if `max_vsnap_streams` is set to `5`, this means that the vSnap server will maintain a pool of at most 5 workers that are available to perform offloads. If `num_of_offloads` is set to `10` this means that the scale test will create 10 data sets (each of size `base_file_size_MB`) and then attempt to offload all of them. The first 5 will begin immediately as there are 5 workers available, while the remaining 5 offloads will wait in a queue. As each worker in the pool finishes its task, it will pick up the next pending offload in the queue, until there are none left. At the end, the test suite evaluates the average throughput of each offload.
+For example, if `max_parallel_sessions` is set to `5`, this means that the vSnap server will maintain a pool of at most 5 workers that are available to perform copy sessions. If `num_of_sessions` is set to `10` this means that the scale test will create 10 data sets (each of size `base_file_size_MB`) and then attempt to upload all of them. The first 5 will begin immediately as there are 5 workers available, while the remaining 5 sessions will wait in a queue. As each worker in the pool finishes its session, it will pick up the next pending session in the queue, until there are none left. At the end, the test suite evaluates the average throughput of each copy session.
 
-You may want to attempt multiple test runs with different versions of `max_vsnap_streams` to evaluate how the average performance scales as the number of workers increases or decreases.
+You can perform multiple test runs with different versions of `max_parallel_sessions` to evaluate how the average performance scales as the number of workers increases or decreases.
 
 Note that increasing the number of workers causes CPU, memory, and network usage to increase as well. The default value of `5` is what most vSnap servers in production run with.
 |====
 
-=== Run the test suite
+=== Expand the primary storage pool
 
-To invoke the test suite, run:
+If you configure the optional test parameters to define data sizes larger than the default values, you may need to expand the storage pool to ensure it is large enough to store the data sets.
 
-----
-s3validator/runtests.sh <test_type>
-----
+To expand the storage pool:
 
-`<test_type>`: Specify `functional`, `performance`, or `scale`.
+* Run `vsnap pool show` and make a note of the pool ID. Typically this is `1` but it may differ.
+* Attach one or more new SCSI disks to the vSnap virtual machine.
+* Run `vsnap disk rescan` and then run `vsnap disk show` to confirm that the newly added disks are all recognized as being unused.
+* Run `vsnap pool expand --id <ID>` (replace `<ID>` with the appropriate pool ID). This command detects all unused SCSI disks and adds them to the existing storage pool.
+* Run `vsnap pool show` to confirm that the expanded size is accurately reflected.
 
-NOTE: Depending on the type of the test and the data sizes involved, the command above may take a long time to complete, ranging from several minutes to several hours. If a test doesn't complete within a certain timeout period, the test is aborted. The default timeout is `86400` seconds (24 hours) but it can be modified in `pytest.ini`.
+=== Expand the cache area
 
-Each time the test suite is invoked, its output is captured in a directory named `s3validator_logs_<timestamp>` under the same parent directory where the `s3validator` archive was extracted.
+For a primary storage pool smaller than 10 TB, the default cache area of 128 GB is sufficient. If you expand the primary storage pool to be larger than 10 TB, you must also expand the cache area to a total size of 500 GB or higher.
 
-For assistance with troubleshooting of test failures, collect a vSnap support bundle using the command `vsnap system logcollect` and provide it to IBM along with the `s3validator_logs_<timestamp>` directory associated with the test run.
+The `/opt/vsnap-data` filesystem sits on an LVM logical volume named `vsnapdatalv` within a volume group named `vsnapdata`.
+
+To expand the cache area:
+
+* Attach a SCSI disk to the system, run `vsnap disk rescan` and then rerun `vsnap disk show` to confirm that they are all recognized as being unused. The sample commands below assume that the newly added disk is named `/dev/sdx`.
+* Create a PV on the disk using command: `sudo pvcreate /dev/sdx`
+* Extend the existing VG using command: `sudo vgextend vsnapdata /dev/sdx`
+* Extend the existing LV using command: `sudo lvextend -l 100%VG /dev/mapper/vsnapdata-vsnapdatalv`
+* Grow the XFS filesystem using command: `sudo xfs_growfs /dev/mapper/vsnapdata-vsnapdatalv`
+* Finally, run `df -h` and verify that the volume `/opt/vsnap-data` is mounted and has the desired new size.
+
