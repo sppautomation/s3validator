@@ -15,18 +15,17 @@ NOTE: Copyright 2019 IBM Corp. All rights reserved. The contents of this documen
 
 == Introduction
 
-This document describes the automated functional and performance tests that you can
-run to validate that a cloud object storage provider is compatible with IBM Spectrum Protect Plus.
+This document describes the automated functional and performance tests that enable you to validate that a cloud object storage provider is compatible with IBM Spectrum Protect Plus.
 
 Running these tests will verify that IBM Spectrum Protect Plus can successfully copy data to and restore from an S3-compatible object storage provider. The tests will also enable you to measure performance and analyze how well the solution scales.
 
 IBM Spectrum Protect Plus (SPP) works by writing data to disk-based storage called vSnap servers which serve as the primary backup destination. Data in vSnap servers can then be copied to S3-compatible object storage providers using an incremental-forever approach.
 
-A typical deployment usually consists of one SPP server which acts as the control plane, and one or more vSnap servers which store data.
+A typical deployment consists of one SPP server which acts as the control plane, and one or more vSnap servers which store data.
 
 SPP is distributed as a pre-built virtual appliance that can be deployed in VMware or Hyper-V environments. vSnap can be similarly deployed as a pre-built virtual appliance, or it can be installed on a custom physical or virtual Linux system that meets certain pre-requisites.
 
-In order to run the validation tests, you do not need to set up an SPP server, but you must at least install and configure a vSnap server, as described in the `Prerequisites` section.
+In order to run the validation tests, an SPP server is not required, but you must at least install and configure a vSnap server, as described in the `Prerequisites` section.
 
 The validation tests are distributed as a `tar.gz` archive consisting of a Python-based test suite and associated configuration files. The tests are designed to run locally on a vSnap server. They work by generating a random set of data, writing it to the vSnap server's disk-based storage pool, and then copying the data to the object storage. The tests also restore data by downloading it from object storage and verifying that its contents are valid.
 
@@ -34,7 +33,7 @@ The validation tests are distributed as a `tar.gz` archive consisting of a Pytho
 
 == Prerequisites
 
-Set up a vSnap server by deploying a virtual appliance or running the installer on a custom Linux system. For simplicity and ease of deployment, using the virtual appliance is highly recommended.
+Set up a vSnap server by deploying the virtual appliance in a VMware vSphere environment.
 
 Detailed instructions for installing, configuring, and managing a vSnap server can be found in https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_install_vsnap.html[IBM Knowledge Center].
 
@@ -42,9 +41,9 @@ The key steps required for configuring the vSnap server for the purpose of the v
 
 === Deploy the vSnap virtual appliance
 
-* Deploy the vSnap OVA in a VMware environment using the `Deploy OVF Template` option.
+* Deploy the vSnap OVA in a VMware vSphere environment using the `Deploy OVF Template` option.
 * Enter network properties for the virtual machine as part of the deployment wizard or leave them blank to use DHCP. You can also configure the network properties at a later time once the virtual machine is up and running.
-* Once deployment completes, before powering on the virtual machine, edit its settings to adjust the virtual hardware. The following values are recommended for a system intended for the validation tests:
+* Once deployment completes, before powering on the virtual machine, edit its settings to adjust the virtual hardware. For a system intended for the validation tests, specify the following configuration:
 ** Number of vCPUs: 8
 ** Total Memory: 40 GB
 ** Number of network adapters: 1
@@ -73,7 +72,7 @@ The validation tests make use of two storage areas on the vSnap server:
 
 The primary storage pool is the data repository where backup data is written. On a freshly installation of vSnap, no storage pool exists. As part of the vSnap initialization process, the pool is created using one or more SCSI disks.
 
-By default, the vSnap virtual appliance includes an unused 100 GB SCSI disk which can be used to create the storage pool.
+By default, the vSnap virtual appliance includes an unused 100 GB SCSI disk which can be used to create the storage pool. You must attach additional disks to the virtual machine in order to create a pool that is 500 GB or larger.
 
 To create the storage pool:
 
@@ -91,7 +90,7 @@ UUID                             | TYPE | VENDOR | MODEL        | SIZE     | USE
 * Attach one or more additional disks to the system totaling at least 500 GB.
 * Run `vsnap disk rescan` and then rerun `vsnap disk show` to confirm that the newly added disks are all recognized as being unused.
 * Run `vsnap system init` to initialize the vSnap installation. As part of the initialization process, vSnap creates a storage pool using all available unused disks.
-* When initialization completes, run `vsnap pool show` to confirm that a storage pool has been created. Note that a freshly created pool will show a few GB of space as being used. This is reserved for internal pool metadata. The rest of the space should be listed as free. Sample output:
+* When initialization completes, run `vsnap pool show` to confirm that a storage pool has been created. Note that a freshly created pool will show a few GB of space as being used. This is reserved for internal pool metadata. The rest of the space is listed as free. Sample output:
 
 ----
 [serveradmin@vsnap ~]$ vsnap pool show
@@ -254,7 +253,7 @@ NOTE: Depending on the type of the test and the data sizes involved, the command
 
 Each time the test suite is invoked, its output is captured in a directory named `s3validator_logs_<timestamp>` under the same parent directory where the `s3validator` archive was extracted.
 
-For assistance with troubleshooting of test failures, collect a vSnap support bundle using the command `vsnap system logcollect` and provide it to IBM along with the `s3validator_logs_<timestamp>` directory associated with the test run.
+For assistance with troubleshooting, collect a vSnap support bundle using the command `vsnap system logcollect` and provide it to IBM along with the `s3validator_logs_<timestamp>` directory associated with the test run.
 
 == Appendix
 
