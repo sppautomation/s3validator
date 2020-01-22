@@ -20,7 +20,7 @@ base_file_size_MB = int(config.get('scale_test', 'base_file_size_MB'))
 max_vsnap_streams = int(config.get('scale_test', 'max_parallel_sessions'))
 
 analysis_offload = PrettyTable()
-analysis_offload.field_names = ["Offload count", "Max streams", "Total Time ", "Total offload size", "Average offload time (sec)", "Average throughput((MB/s))" ]
+analysis_offload.field_names = ["Session count", "Max parallel sessions", "Total Time ", "Total size", "Average session time", "Average throughput (MB/s)" ]
 
 @pytest.fixture(scope="module")
 def setup(global_config, request):
