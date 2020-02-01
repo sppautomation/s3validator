@@ -9,7 +9,7 @@ for IBM Spectrum Protect Plus
 :pdf-page-size: letter
 :source-highlighter: highlight.js
 
-NOTE: Copyright 2019 IBM Corp. All rights reserved. The contents of this document and any attachments are strictly confidential and are supplied on the understanding that they will be held confidentially and not disclosed to third parties without the prior written consent of IBM.
+NOTE: Copyright 2020 IBM Corp. All rights reserved. The contents of this document and any attachments are strictly confidential and are supplied on the understanding that they will be held confidentially and not disclosed to third parties without the prior written consent of IBM.
 
 <<<
 
@@ -33,25 +33,33 @@ The validation tests are distributed as a `tar.gz` archive consisting of a Pytho
 
 == Prerequisites
 
-Set up a vSnap server by deploying the virtual appliance in a VMware vSphere environment.
+=== Overview
 
-Detailed instructions for installing, configuring, and managing a vSnap server can be found in https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_install_vsnap_vmware.html[IBM Knowledge Center].
+Set up a vSnap server by deploying the virtual appliance in VMware vSphere.
 
-The key steps required for configuring the vSnap server for the purpose of the validation tests are summarized below.
+Summary of virtual hardware requirements:
+
+* 8 virtual CPUs
+* 40 GB memory
+* 10 Gb network adapter
+* 2 TB datatore
+* Internet access
+
+Detailed instructions for installing, configuring, and managing a vSnap server can be found in https://www.ibm.com/support/knowledgecenter/en/SSNQFQ_10.1.5/spp/t_spp_install_vsnap_vmware.html[IBM Knowledge Center]. The key steps required for configuring the vSnap server for the purpose of the validation tests are summarized below.
 
 === Deploy the vSnap virtual appliance
 
-* Deploy the vSnap OVA in a VMware vSphere environment using the `Deploy OVF Template` option.
-* Enter network properties for the virtual machine as part of the deployment wizard or leave them blank to use DHCP. You can also configure the network properties at a later time once the virtual machine is up and running.
-* Once deployment completes, before powering on the virtual machine, edit its settings to adjust the virtual hardware. For a system intended for the validation tests, specify the following configuration:
+1. Deploy the vSnap OVA in a VMware vSphere environment using the `Deploy OVF Template` option.
+2. Enter network properties for the virtual machine as part of the deployment wizard or leave them blank to use DHCP. You can also configure the network properties at a later time once the virtual machine is up and running.
+3. Once deployment completes, before powering on the virtual machine, edit its settings to adjust the virtual hardware. For a system intended for the validation tests, specify the following configuration:
 ** Number of vCPUs: 8
 ** Total Memory: 40 GB
 ** Number of network adapters: 1
 *** Using a 10 Gbit network adapter is recommended.
-* Power on the virtual machine and login using the default credentials:
+4. Power on the virtual machine and login using the default credentials:
 ** Username: `serveradmin`
 ** Password: `sppDP758-SysXyz`
-* Upon initial login, you are prompted to change the default password. Enter the default password first, then enter the new password twice. Upon changing the password, you are immediately logged out and must log back in using the new password.
+5. Upon initial login, you are prompted to change the default password. Enter the default password first, then enter the new password twice. Upon changing the password, you are immediately logged out and must log back in using the new password.
 
 NOTE: The `serveradmin` user has `sudo` privileges.
 
@@ -65,8 +73,8 @@ NOTE: Internet access is required in order to download updates and dependencies 
 
 The validation tests make use of two storage areas on the vSnap server:
 
-* The primary disk-based storage pool where data is initially written. A storage pool of at least 500 GB is required for the validation tests.
-* A disk-based cache area where data is temporarily staged while it is being copied from the primary storage pool to the object storage. A cache area of at least 128 GB is required for the validation tests.
+1. The primary disk-based storage pool where data is initially written. A storage pool of at least 500 GB is required for the validation tests.
+2. A disk-based cache area where data is temporarily staged while it is being copied to/from from the primary storage pool to the object storage. A cache area of at least 1 TB is required for the validation tests.
 
 *Primary storage pool*
 
@@ -76,8 +84,8 @@ By default, the vSnap virtual appliance includes an unused 100 GB SCSI disk whic
 
 To create the storage pool:
 
-* Run `vsnap disk show` to list disks and confirm that one or more unused SCSI disks are available. By default, the vSnap virtual appliance includes an unused 100 GB SCSI disk (`/dev/sdb`) as seen in the sample output below:
-
+1. Run `vsnap disk show` to list disks and confirm that one or more unused SCSI disks are available. By default, the vSnap virtual appliance includes an unused 100 GB SCSI disk (`/dev/sdb`) as seen in the sample output below:
++
 ----
 [serveradmin@vsnap ~]$ vsnap disk show
 UUID                             | TYPE | VENDOR | MODEL        | SIZE     | USED AS     | KNAME | NAME
@@ -86,12 +94,11 @@ UUID                             | TYPE | VENDOR | MODEL        | SIZE     | USE
 6000c293f48c897ded5c3b50afb7ca28 | SCSI | VMware | Virtual disk | 100.00GB | unused      | sdb   | /dev/sdb
 6000c294c22b7968054789932dcf6621 | SCSI | VMware | Virtual disk | 128.00GB | LVM2_member | sdc   | /dev/sdc
 ----
-
-* Attach one or more additional disks to the system totaling at least 500 GB.
-* Run `vsnap disk rescan` and then rerun `vsnap disk show` to confirm that the newly added disks are all recognized as being unused.
-* Run `vsnap system init` to initialize the vSnap installation. As part of the initialization process, vSnap creates a storage pool using all available unused disks.
-* When initialization completes, run `vsnap pool show` to confirm that a storage pool has been created. Note that a freshly created pool will show a few GB of space as being used. This is reserved for internal pool metadata. The rest of the space is listed as free. Sample output:
-
+2. Attach one or more additional disks to the system totaling at least 500 GB.
+3. Run `vsnap disk rescan` and then rerun `vsnap disk show` to confirm that the newly added disks are all recognized as being unused.
+4. Run `vsnap system init` to initialize the vSnap installation. As part of the initialization process, vSnap creates a storage pool using all available unused disks.
+5. When initialization completes, run `vsnap pool show` to confirm that a storage pool has been created. Note that a freshly created pool will show a few GB of space as being used. This is reserved for internal pool metadata. The rest of the space is listed as free. Sample output:
++
 ----
 [serveradmin@vsnap ~]$ vsnap pool show
 TOTAL: 1
@@ -124,7 +131,18 @@ DISKS IN POOL:
 
 *Cache area*
 
-By default, the vSnap virtual appliance includes a 128 GB XFS filesystem mounted at `/opt/vsnap-data` which is used as the cache area. This is sufficient for the validation tests and no further manual configuration is required.
+By default, the vSnap virtual appliance includes a 128 GB XFS filesystem mounted at `/opt/vsnap-data` which is used as the cache area. The `/opt/vsnap-data` filesystem sits on an LVM logical volume named `vsnapdatalv` within a volume group named `vsnapdata`.
+
+You must attach additional disks to the virtual machine and expand this filesystem in order to create a cache area that is 1 TB or larger.
+
+To expand the cache area:
+
+1. Attach one or more SCSI disks to the system totaling at least 900 GB, run `vsnap disk rescan` and then rerun `vsnap disk show` to confirm that they are all recognized as being unused. The sample commands below assume that the newly added disk is named `/dev/sdx`.
+2. Create a PV on the disk using command: `sudo pvcreate /dev/sdx`
+3. Extend the existing VG using command: `sudo vgextend vsnapdata /dev/sdx`
+4. Extend the existing LV using command: `sudo lvextend -l 100%VG /dev/mapper/vsnapdata-vsnapdatalv`
+5. Grow the XFS filesystem using command: `sudo xfs_growfs /dev/mapper/vsnapdata-vsnapdatalv`
+6. Finally, run `df -h` and verify that the volume `/opt/vsnap-data` is mounted and has the desired new size.
 
 <<<
 
@@ -132,21 +150,19 @@ By default, the vSnap virtual appliance includes a 128 GB XFS filesystem mounted
 
 === Download and install the test suite
 
-* Login to the vSnap server as the `serveradmin` user.
-* Run the following command to install the most up-to-date SSL certificates.
-
+1. Login to the vSnap server as the `serveradmin` user.
+2. Run the following command to install the most up-to-date SSL certificates.
++
 ----
 sudo yum --enablerepo=base,updates reinstall ca-certificates
 ----
-
-* The test suite is distributed as a `tar.gz` archive. Download the archive to the vSnap server, copy it to a suitable directory (e.g. `/home/serveradmin/`) and extract it using the command. The contents of the archive are extracted to a directory named `s3validator-<version>`.
-
+3. The test suite is distributed as a `tar.gz` archive. Download the archive to the vSnap server, copy it to a suitable directory (e.g. `/home/serveradmin/`) and extract it using the command. The contents of the archive are extracted to a directory named `s3validator-<version>`.
++
 ----
 tar -xzvf <filename>
 ----
-
-* Invoke the installation script using the command:
-
+4. Invoke the installation script using the command:
++
 ----
 s3validator-<version>/install.sh
 ----
@@ -198,10 +214,10 @@ The test performs multiple uploads sessions to the S3 endpoint concurrently and 
 
 === Configure the test suite
 
-* As the `serveradmin` user, run the command `vsnap user create` to create a new vSnap API user. Specify a new username and password when prompted.
-
+1. As the `serveradmin` user, run the command `vsnap user create` to create a new vSnap API user. Specify a new username and password when prompted.
++
 Sample output:
-
++
 ----
 [serveradmin@vsnap ~]$ vsnap user create
 Username: testuser
@@ -213,12 +229,11 @@ GID: 1003
 NAME: testuser
 ROLE: vsnap_admin
 ----
-
-* Modify the file `s3validator-<version>/tests/pytest.ini`. Under the `[pytest]` section of the configuration file, update the `username` and `password` values to specify the credentials of the newly created user.
-* To configure the endpoint details, modify the file `s3validator-<version>/tests/config/cloud_endpoint.json` and set the appropriate values as described below.
-
+2. Modify the file `s3validator-<version>/tests/pytest.ini`. Under the `[pytest]` section of the configuration file, update the `username` and `password` values to specify the credentials of the newly created user.
+3. To configure the endpoint details, modify the file `s3validator-<version>/tests/config/cloud_endpoint.json` and set the appropriate values as described below.
++
 Fields in `cloud_endpoint.json`:
-
++
 [cols="30%a,70%a", options="header"]
 |====
 |Field|Description
@@ -231,20 +246,18 @@ Fields in `cloud_endpoint.json`:
 
 === Run the test suite
 
-* To invoke the functional tests, run:
-
+1. To invoke the functional tests, run:
++
 ----
 s3validator-<version>/runtests.sh functional
 ----
-
-* To invoke the performance tests, run:
-
+2. To invoke the performance tests, run:
++
 ----
 s3validator-<version>/runtests.sh performance
 ----
-
-* To invoke the scale tests, run:
-
+3. To invoke the scale tests, run:
++
 ----
 s3validator-<version>/runtests.sh scale
 ----
@@ -311,24 +324,9 @@ If you configure the optional test parameters to define data sizes larger than t
 
 To expand the storage pool:
 
-* Run `vsnap pool show` and make a note of the pool ID. Typically this is `1` but it may differ.
-* Attach one or more new SCSI disks to the vSnap virtual machine.
-* Run `vsnap disk rescan` and then run `vsnap disk show` to confirm that the newly added disks are all recognized as being unused.
-* Run `vsnap pool expand --id <ID>` (replace `<ID>` with the appropriate pool ID). This command detects all unused SCSI disks and adds them to the existing storage pool.
-* Run `vsnap pool show` to confirm that the expanded size is accurately reflected.
-
-=== Expand the cache area
-
-For a primary storage pool smaller than 10 TB, the default cache area of 128 GB is sufficient. If you expand the primary storage pool to be larger than 10 TB, you must also expand the cache area to a total size of 500 GB or higher.
-
-The `/opt/vsnap-data` filesystem sits on an LVM logical volume named `vsnapdatalv` within a volume group named `vsnapdata`.
-
-To expand the cache area:
-
-* Attach a SCSI disk to the system, run `vsnap disk rescan` and then rerun `vsnap disk show` to confirm that they are all recognized as being unused. The sample commands below assume that the newly added disk is named `/dev/sdx`.
-* Create a PV on the disk using command: `sudo pvcreate /dev/sdx`
-* Extend the existing VG using command: `sudo vgextend vsnapdata /dev/sdx`
-* Extend the existing LV using command: `sudo lvextend -l 100%VG /dev/mapper/vsnapdata-vsnapdatalv`
-* Grow the XFS filesystem using command: `sudo xfs_growfs /dev/mapper/vsnapdata-vsnapdatalv`
-* Finally, run `df -h` and verify that the volume `/opt/vsnap-data` is mounted and has the desired new size.
+1. Run `vsnap pool show` and make a note of the pool ID. Typically this is `1` but it may differ.
+2. Attach one or more new SCSI disks to the vSnap virtual machine.
+3. Run `vsnap disk rescan` and then run `vsnap disk show` to confirm that the newly added disks are all recognized as being unused.
+4. Run `vsnap pool expand --id <ID>` (replace `<ID>` with the appropriate pool ID). This command detects all unused SCSI disks and adds them to the existing storage pool.
+5. Run `vsnap pool show` to confirm that the expanded size is accurately reflected.
 
