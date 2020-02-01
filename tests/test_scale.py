@@ -100,7 +100,7 @@ def get_time_in_seconds(time_string):
     return int(h) * 3600 + int(m) * 60 + int(s)
 
 @pytest.mark.parametrize("count", range(count_of_offloads))
-def test_createmulti_offloads(count, global_config, setup):
+def test_multioffload_prepare(count, global_config, setup):
     session = global_config.session
     resources = setup
 
@@ -169,15 +169,22 @@ def test_createmulti_offloads(count, global_config, setup):
 
     resources['relationships'].append(resources['relationship']['id'])
 
+
+@pytest.mark.parametrize("count", range(count_of_offloads))
+def test_multioffload_start(count, global_config, setup):
+
+    session = global_config.session
+    resources = setup
+
     syncsess = client.VsnapAPI(session, 'api/relationship').post(
-        path=resources['relationship']['id'] + "/session?partner_type=cloud", data={})
+        path=resources['relationships'][count] + "/session?partner_type=cloud", data={})
 
     resources['offload_sessions'].append(syncsess)
     print("\n Offload session number {} created".format(count))
 
 
 @pytest.mark.parametrize("count", range(count_of_offloads))
-def test_multioffload_status(count, global_config, setup):
+def test_multioffload_monitor(count, global_config, setup):
 
     session = global_config.session
     resources = setup
