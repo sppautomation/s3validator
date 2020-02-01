@@ -135,7 +135,8 @@ def monitor_sync_session(clientsess, sync_id):
 
                 time_taken = int(offload_session['time_ended']) - int(offload_session['time_started'])
                 t = str(datetime.timedelta(seconds=time_taken))
-                throughput = str(round(offload_session['size_sent'] / time_taken, 2))
+                throughput = (offload_session['size_sent'] / (1000*1000)) / time_taken
+                throughput = str(round(throughput, 2))
 
                 analysis_offload.add_row(["Upload", "{} (hh:mm:ss)".format(t), throughput, size])
                 print(analysis_offload)
