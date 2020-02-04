@@ -32,7 +32,7 @@ def setup(global_config, request):
     resources['mountpoints'] = []
     resources['offload_sessions'] = []
     resources['total_offload_time'] = 1
-    resources['start_time'] = time.time()
+    resources['start_time'] = 0
     resources["total_offload_size"] = 1
     request.addfinalizer(lambda: cleanup(global_config, resources))
 
@@ -175,6 +175,9 @@ def test_multioffload_start(count, global_config, setup):
 
     session = global_config.session
     resources = setup
+
+    if resources['start_time'] == 0:
+        resources['start_time'] = time.time()
 
     syncsess = client.VsnapAPI(session, 'api/relationship').post(
         path=resources['relationships'][count] + "/session?partner_type=cloud", data={})
